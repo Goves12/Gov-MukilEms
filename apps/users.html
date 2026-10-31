@@ -9,11 +9,10 @@
   :root {
     --bg: #0b0f14; --panel-2: #1c2839; --text: #e8eef7; --muted: #8496ab;
     --border: #26344a; --border-strong: #3a4a66; --accent: #2f9e44;
-    --error-bg: #4c1d1d; --error-text: #fecaca;
+    --error-bg: #4c1d1d; --error-text: #fecaca; --red: #ef4444;
   }
   body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
   
-  /* Шапка */
   .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .header-left { display: flex; align-items: center; gap: 12px; }
   
@@ -27,7 +26,6 @@
   
   .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
   
-  /* Список */
   #usersList { border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2); overflow: hidden; }
   .user-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
   .user-row:last-child { border-bottom: none; }
@@ -38,7 +36,6 @@
   .btn-small { padding: 6px 12px; font-size: 0.75rem; border-radius: 8px; background: var(--border); color: var(--text); border: none; cursor: pointer; }
   .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
   
-  /* Форма */
   .form-group { margin-bottom: 12px; }
   label { display: block; font-size: 0.72rem; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
   input, select { width: 100%; padding: 10px; font-size: 0.95rem; background: #0d1520; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
@@ -49,7 +46,6 @@
 </head>
 <body>
 
-<!-- Шапка с кнопкой Назад -->
 <div class="header-row">
   <div class="header-left">
     <button class="btn-back" id="backBtn">
@@ -77,9 +73,9 @@
       <option value="Бог">Бог</option>
     </select>
   </div>
-    <div class="form-group">
-    <label>Отдел</label>
+  <div class="form-group"><label>Отдел</label>
     <select id="newUserDepartment">
+      <!-- ОСТАВЛЯЕМ ТОЛЬКО ОДИН ОТДЕЛ -->
       <option value="МинЗдрав">МинЗдрав</option>
     </select>
   </div>
@@ -91,34 +87,45 @@
 
 <script>
   const $ = (id) => document.getElementById(id);
+  const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; // Твой адрес
 
-  // 1. Кнопка Назад
-  $("backBtn").addEventListener("click", () => {
-    window.parent.postMessage({ action: "goBack" }, "*");
-  });
+  // Кнопка назад
+  $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
-  // Временная локальная база (для теста)
-  const USERS_DB_KEY = "hospital_users_db_v2";
-  function getUsersDB() { return JSON.parse(localStorage.getItem(USERS_DB_KEY) || "[]"); }
-  function saveUsersDB(db) { localStorage.setItem(USERS_DB_KEY, JSON.stringify(db)); }
-
+  // Хэширование
   async function sha256Hex(text) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
-  function renderUsersList() {
-    const db = getUsersDB();
-    if (db.length === 0) {
-      $("usersList").innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted);">Пока нет пользователей</div>';
-      return;
+  // Загрузка списка с сервера
+  async function loadUsers() {
+    $("usersList").innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted);">Загрузка...</div>';
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "getUsers" })
+      });
+      const data = await res.json();
+      
+      if (data.success && data.users.length > 0) {
+        renderUsers(data.users);
+      } else {
+        $("usersList").innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted);">Нет пользователей</div>';
+      }
+    } catch (e) {
+      $("usersList").innerHTML = '<div style="padding:20px; text-align:center; color:var(--red);">Ошибка связи с сервером</div>';
     }
+  }
 
-    $("usersList").innerHTML = db.map(u => `
+  // Отрисовка
+  function renderUsers(users) {
+    $("usersList").innerHTML = users.map(u => `
       <div class="user-row">
         <div class="user-info">
           <span class="user-login">${u.login}</span>
-          <span class="user-role">Роль: ${u.role} ${u.department ? '· Отдел: ' + u.department : ''} ${u.isTemp ? '(врем. пароль)' : ''}</span>
+          <span class="user-role">Роль: ${u.role} · Отдел: ${u.department || 'МинЗдрав'} ${u.isTemp ? '(врем. пароль)' : ''}</span>
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn-small" onclick="editUser('${u.login}')">Изменить</button>
@@ -128,74 +135,95 @@
     `).join('');
   }
 
+  // Открыть форму
   $("addUserBtn").addEventListener("click", () => {
     $("userFormTitle").textContent = "Новый пользователь";
     $("editUserLogin").value = "";
     $("newUserLogin").value = "";
     $("newUserPassword").value = "12345";
     $("newUserRole").value = "Сотрудник";
-    $("newUserDepartment").value = "МинЗдрав";
+    $("newUserDepartment").value = "МинЗдрав"; // Жестко ставим МинЗдрав
     $("newUserLogin").disabled = false;
     $("userFormBlock").classList.remove("hidden");
   });
 
   $("cancelUserBtn").addEventListener("click", () => $("userFormBlock").classList.add("hidden"));
 
+  // Сохранить
   $("saveUserBtn").addEventListener("click", async () => {
     const editLogin = $("editUserLogin").value;
     const login = $("newUserLogin").value.trim().toLowerCase();
     const pass = $("newUserPassword").value;
     const role = $("newUserRole").value;
-    const department = $("newUserDepartment").value;
+    const department = "МинЗдрав"; // Всегда отправляем только МинЗдрав
 
     if (!login) return alert("Введите логин");
-    let db = getUsersDB();
+    if (!editLogin && !pass) return alert("Введите пароль");
 
-    if (editLogin) {
-      const idx = db.findIndex(u => u.login === editLogin);
-      if (idx !== -1) {
-        db[idx].role = role;
-        db[idx].department = department;
-        if (pass) {
-          db[idx].hash = await sha256Hex(pass);
-          db[idx].isTemp = true;
-        }
+    const btn = $("saveUserBtn");
+    btn.disabled = true; btn.textContent = "Отправка...";
+
+    try {
+      const newHash = pass ? await sha256Hex(pass) : null;
+      
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "saveUser", 
+          isEdit: !!editLogin,
+          login, 
+          newHash, 
+          role, 
+          department 
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        $("userFormBlock").classList.add("hidden");
+        loadUsers();
+      } else {
+        alert("Ошибка сохранения: " + data.message);
       }
-    } else {
-      if (!pass) return alert("Введите пароль");
-      if (db.find(u => u.login === login)) return alert("Логин занят");
-      db.push({ login, hash: await sha256Hex(pass), role, department, isTemp: true });
+    } catch (e) {
+      alert("Ошибка сети!");
+    } finally {
+      btn.disabled = false; btn.textContent = "Сохранить";
     }
-
-    saveUsersDB(db);
-    $("userFormBlock").classList.add("hidden");
-    renderUsersList();
   });
 
   window.editUser = (login) => {
-    const u = getUsersDB().find(x => x.login === login);
-    if (!u) return;
-    $("userFormTitle").textContent = "Редактировать: " + login;
-    $("editUserLogin").value = login;
-    $("newUserLogin").value = login;
-    $("newUserLogin").disabled = true;
-    $("newUserPassword").value = "";
-    $("newUserPassword").placeholder = "Оставьте пустым, чтобы не менять";
-    $("newUserRole").value = u.role;
-    $("newUserDepartment").value = u.department || "СМП";
-    $("userFormBlock").classList.remove("hidden");
+    fetch(WORKER_URL, { method: "POST", body: JSON.stringify({ action: "getUsers" }) })
+      .then(r => r.json())
+      .then(data => {
+        const u = data.users.find(x => x.login === login);
+        if (!u) return;
+        
+        $("userFormTitle").textContent = "Редактировать: " + login;
+        $("editUserLogin").value = login;
+        $("newUserLogin").value = login;
+        $("newUserLogin").disabled = true;
+        $("newUserPassword").value = "";
+        $("newUserPassword").placeholder = "Оставьте пустым, чтобы не менять";
+        $("newUserRole").value = u.role;
+        $("newUserDepartment").value = "МинЗдрав";
+        $("userFormBlock").classList.remove("hidden");
+      });
   };
 
   window.deleteUser = (login) => {
     if (login === 'todd') return alert("Нельзя удалить главного администратора!");
     if (!confirm(`Удалить пользователя ${login}?`)) return;
-    let db = getUsersDB();
-    db = db.filter(u => u.login !== login);
-    saveUsersDB(db);
-    renderUsersList();
+    
+    fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteUser", login })
+    }).then(() => loadUsers());
   };
 
-  renderUsersList();
+  loadUsers();
 </script>
 </body>
 </html>
