@@ -199,12 +199,106 @@
   @media (max-width: 600px) {
     .app-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   }
+
+    /* ============ СТАТУС-БАР (СВЕРХУ) ============ */
+  .status-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 8px 16px;
+    background: #0a0e14; border-bottom: 1px solid var(--border);
+    font-size: 0.78rem; color: var(--muted);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .status-left, .status-right { display: flex; align-items: center; gap: 12px; }
+  
+  .status-bar .net-indicator { display: inline-flex; align-items: center; gap: 8px; }
+  .status-bar .wifi-icon {
+    width: 18px; height: 18px; color: #2f9e44;
+    animation: wifiPulse 2s infinite;
+  }
+  .status-bar .wifi-icon.offline { color: #ef4444; animation: none; }
+  @keyframes wifiPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  .status-bar .clock {
+    font-variant-numeric: tabular-nums; font-weight: 600;
+    color: var(--text); letter-spacing: 0.04em;
+  }
+  .status-bar .battery {
+    display: inline-flex; align-items: center; gap: 6px; color: var(--muted);
+  }
+  .status-bar .battery .bat-body {
+    width: 22px; height: 11px; border: 1.5px solid var(--muted);
+    border-radius: 3px; padding: 1px; position: relative; display: flex; align-items: center;
+  }
+  .status-bar .battery .bat-body::after {
+    content: ""; position: absolute; right: -3px; top: 50%;
+    transform: translateY(-50%); width: 2px; height: 4px; border-radius: 0 1px 1px 0;
+    background: var(--muted);
+  }
+  .status-bar .battery .bat-level {
+    height: 100%; border-radius: 1px; background: #2f9e44;
+  }
+  .status-bar .battery .bat-text { font-variant-numeric: tabular-nums; font-size: 0.72rem; }
+
+  .status-bar .user-info { display: flex; align-items: center; gap: 6px; color: var(--text); }
+  .status-bar .role-badge {
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 999px; letter-spacing: 0.04em;
+  }
+  
+  /* Цвета ролей */
+  .role-bog { background: linear-gradient(135deg, #f59e0b, #b45309); color: #1a1207; box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+  .role-minister { background: #4c1d95; color: #ddd6fe; }
+  .role-senior { background: #1e3a8a; color: #bfdbfe; }
+  .role-worker { background: #14532d; color: #bbf7d0; }
+  .role-vesti { background: #64748b; color: #f1f5f9; }
+    /* ============ СПИСОК ПОЛЬЗОВАТЕЛЕЙ ============ */
+  .user-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .user-row:last-child { border-bottom: none; }
+  .user-info-col { display: flex; flex-direction: column; gap: 4px; }
+  .user-login-text { font-weight: 600; font-size: 0.95rem; }
+  .user-role-text { font-size: 0.75rem; color: var(--muted); }
+  .user-actions { display: flex; gap: 8px; }
+  .btn-small {
+    padding: 6px 12px; font-size: 0.75rem; border-radius: 8px;
+    background: var(--border); color: var(--text); border: none; cursor: pointer;
+  }
+  .btn-small:hover { background: var(--border-strong); }
+  .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.4); }
 </style>
 </head>
 <body>
 
 <div class="tablet">
   <div class="header">
+      <!-- СТАТУС-БАР -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span class="net-indicator" title="Связь с сервером">
+        <svg class="wifi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+          <circle cx="12" cy="20" r="0.9" fill="currentColor" stroke="none"/>
+        </svg>
+        <span id="statusNetwork">Планшет в сети</span>
+      </span>
+    </div>
+    <div class="status-right">
+      <span class="user-info hidden" id="statusUserBlock">
+        <span id="statusLogin">—</span>
+        <span class="role-badge" id="statusRole">—</span>
+      </span>
+      <span class="battery" title="Заряд батареи">
+        <span class="bat-body"><span class="bat-level" id="batLevel" style="width:100%"></span></span>
+        <span class="bat-text" id="batText">100%</span>
+      </span>
+      <span class="clock" id="statusClock">--:--:--</span>
+    </div>
+  </div>
     <div class="logo"></div>
     <div class="title">
       <h1>Планшет Больницы</h1>
@@ -255,6 +349,44 @@
 
     <!-- ================= РАБОЧИЙ СТОЛ ================= -->
     <div class="desk-screen hidden" id="deskScreen">
+            <!-- ================= УЧЁТНЫЕ ЗАПИСИ ================= -->
+    <div class="app-screen hidden" id="usersScreen" style="padding: 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="font-size:1.2rem; font-weight:700;">Учётные записи</h2>
+        <button class="btn-primary" id="addUserBtn" style="width:auto; padding:8px 16px;">+ Добавить</button>
+      </div>
+
+      <div id="usersList" style="background:var(--panel-2); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <!-- Сюда будут вставляться пользователи -->
+      </div>
+
+      <!-- Форма добавления/редактирования -->
+      <div id="userFormBlock" class="hidden" style="margin-top:20px; background:var(--panel-2); border:1px solid var(--border); border-radius:12px; padding:20px;">
+        <h3 id="userFormTitle" style="margin-bottom:15px;">Новый пользователь</h3>
+        <input type="hidden" id="editUserLogin">
+        
+        <div class="form-group">
+          <label>Логин</label>
+          <input type="text" id="newUserLogin" placeholder="Например: doctor_ivan">
+        </div>
+        <div class="form-group">
+          <label>Временный пароль</label>
+          <input type="text" id="newUserPassword" placeholder="12345">
+        </div>
+        <div class="form-group">
+          <label>Роль</label>
+          <select id="newUserRole" style="width:100%; padding:12px; background:#0d1520; border:1px solid var(--border); border-radius:10px; color:white;">
+            <option value="Сотрудник">Сотрудник</option>
+            <option value="Старший состав">Старший состав</option>
+            <option value="Бог">Бог</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button class="btn-primary" id="saveUserBtn" style="flex:1;">Сохранить</button>
+          <button class="btn-primary" id="cancelUserBtn" style="flex:1; background:var(--muted);">Отмена</button>
+        </div>
+      </div>
+    </div>
       <div class="greeting">
         <h2 id="greetingTitle">Добро пожаловать</h2>
         <p id="greetingSub">Выберите приложение</p>
@@ -335,23 +467,15 @@
   // ============================================================
   //  ПРИЛОЖЕНИЯ
   // ============================================================
+     // ============================================================
+  //  ПРИЛОЖЕНИЯ (с учетом ролей)
+  // ============================================================
   const APPS = [
-    {
-      label: "Персонал", sub: "Список сотрудников", color: "blue",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
-    },
-    {
-      label: "Отпуска", sub: "IC · OOC", color: "amber",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 15l2 2 4-4"/></svg>'
-    },
-    {
-      label: "Калькулятор", sub: "Баллы · отчёт", color: "red",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>'
-    },
-    {
-      label: "О системе", sub: "Настройки", color: "gray",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
-    }
+    { id: 'staff', label: "Персонал", sub: "Список", color: "blue", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', roles: ['Бог', 'Министр здравоохранения', 'Старший состав', 'Работник', 'Вести'] },
+    { id: 'calc', label: "Калькулятор", sub: "Отчёт", color: "red", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>', roles: ['Бог', 'Министр здравоохранения'] },
+    { id: 'weekly', label: "Недельный отчет", sub: "Статистика", color: "amber", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="19" x2="13" y2="19"/></svg>', roles: ['Бог', 'Министр здравоохранения'] },
+    { id: 'about', label: "О системе", sub: "Настройки", color: "gray", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>', roles: ['Бог', 'Министр здравоохранения', 'Старший состав', 'Работник', 'Вести'] }
+    { id: 'users', label: "Учётные записи", sub: "Управление", color: "purple", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>', roles: ['Бог'] }
   ];
 
   // ============================================================
@@ -404,13 +528,25 @@
   // ============================================================
   //  РЕНДЕР
   // ============================================================
-  function renderApps() {
+    function renderApps() {
     appGrid.innerHTML = "";
+    const session = loadSession();
+    
     APPS.forEach((a) => {
+      // Проверка прав: если роли нет в списке, не показываем плитку
+      if (session && a.roles && !a.roles.includes(session.role)) return;
+
       const tile = document.createElement("div");
       tile.className = "app-tile";
       tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
-      tile.addEventListener("click", () => alert("Приложение " + a.label + " в разработке"));
+      
+      tile.addEventListener("click", () => {
+        if (a.id === 'users') {
+          showUsersScreen();
+        } else {
+          alert("Приложение " + a.label + " в разработке");
+        }
+      });
       appGrid.appendChild(tile);
     });
   }
@@ -423,14 +559,30 @@
     loginNotification.classList.remove("show");
   }
 
-  function showDesk(session) {
+    function showDesk(session) {
     authScreen.classList.add("hidden");
     deskScreen.classList.remove("hidden");
     userChip.classList.add("visible");
+    
+    // Обновляем шапку
     userName.textContent = session.login;
     userAvatar.textContent = (session.login || "?").charAt(0).toUpperCase();
+    
+    // Роль и логин в статус-баре
+    document.getElementById('statusUserBlock').classList.remove('hidden');
+    document.getElementById('statusLogin').textContent = session.login;
+    
+    const roleBadge = document.getElementById('statusRole');
+    roleBadge.textContent = session.role || "Работник";
+    roleBadge.className = "role-badge"; // сброс
+    if (session.role === 'Бог') roleBadge.classList.add('role-bog');
+    else if (session.role === 'Министр здравоохранения') roleBadge.classList.add('role-minister');
+    else if (session.role === 'Старший состав') roleBadge.classList.add('role-senior');
+    else if (session.role === 'Работник') roleBadge.classList.add('role-worker');
+    else roleBadge.classList.add('role-vesti');
+
     greetingTitle.textContent = "Добро пожаловать, " + session.login;
-    greetingSub.textContent = "Выберите приложение";
+    greetingSub.textContent = "Роль: " + (session.role || "Работник");
     renderApps();
   }
 
@@ -439,35 +591,19 @@
   // ============================================================
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const login = loginInput.value.trim();
-    const password = passwordInput.value;
-    if (!login || !password) return;
-
-    loginSubmit.disabled = true;
-    loginSubmit.textContent = "Проверка…";
-
-    try {
-      const hash = await sha256Hex(password);
+          const db = getUsersDB();
+      const user = db.find(u => u.login === login.toLowerCase());
+      
       let isSuccess = false;
       let mustChange = false;
+      let userRole = "Сотрудник";
 
-      if (login.toLowerCase() === "todd") {
-        // Проверяем, менял ли он уже пароль
-        const savedHash = getPasswordHash("todd");
-        
-        if (savedHash) {
-          // Если менял — проверяем совпадение
-          if (hash === savedHash) isSuccess = true;
-        } else {
-          // Если не менял — пускаем только с 12345
-          if (hash === TEMP_PASSWORD_HASH) {
-            isSuccess = true;
-            mustChange = true; // Требуем смену
-          }
+      if (user) {
+        if (hash === user.hash) {
+          isSuccess = true;
+          userRole = user.role;
+          mustChange = user.isTemp; // Если стоит флаг временного пароля
         }
-      } else {
-        notify(loginNotification, "Неизвестный пользователь. Попробуйте Todd.", "error");
-        return;
       }
 
       if (!isSuccess) {
@@ -475,28 +611,17 @@
         return;
       }
 
-      // Сохраняем сессию
-      const session = { login: login, role: "user", ts: Date.now() };
+      const session = { login: login, role: userRole, ts: Date.now() };
       saveSession(session);
-
+      
+      // Если пароль временный - кидаем на смену
       if (mustChange) {
-        // Показываем модалку смены пароля
         authScreen.classList.add("hidden");
         forcePasswordModal.classList.remove("hidden");
         setTimeout(() => fpNew1.focus(), 100);
       } else {
-        // Пускаем на рабочий стол
         showDesk(session);
       }
-
-    } catch (err) {
-      console.error(err);
-      notify(loginNotification, "Ошибка: " + err.message, "error");
-    } finally {
-      loginSubmit.disabled = false;
-      loginSubmit.textContent = "Войти по логину";
-    }
-  });
 
   // ============================================================
   //  ПРИНУДИТЕЛЬНАЯ СМЕНА ПАРОЛЯ
@@ -505,6 +630,17 @@
     e.preventDefault();
     const p1 = fpNew1.value;
     const p2 = fpNew2.value;
+          const newHash = await sha256Hex(p1);
+      
+      // Обновляем базу
+      let db = getUsersDB();
+      const uIdx = db.findIndex(u => u.login === session.login);
+      if (uIdx !== -1) {
+        db[uIdx].hash = newHash;
+        db[uIdx].isTemp = false; // Снимаем флаг
+        saveUsersDB(db);
+      }
+      // ... дальше твой код с закрытием модалки
 
     if (!p1 || !p2) { notify(fpNotification, "Заполните все поля", "error"); return; }
     if (p1.length < 4) { notify(fpNotification, "Пароль слишком короткий (мин. 4)", "error"); return; }
@@ -541,7 +677,178 @@
   // ============================================================
   //  СТАРТ
   // ============================================================
+    // ============================================================
+  //  СТАТУС-БАР: ЧАСЫ И БАТАРЕЯ
+  // ============================================================
+  function tickClock() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    document.getElementById('statusClock').textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  function initBattery() {
+    if (!navigator.getBattery) return;
+    navigator.getBattery().then((battery) => {
+      const render = () => {
+        const pct = Math.round(battery.level * 100);
+        document.getElementById('batText').textContent = pct + "%";
+        document.getElementById('batLevel').style.width = Math.max(2, pct) + "%";
+      };
+      render();
+      battery.addEventListener("levelchange", render);
+    });
+  }
+  initBattery();
+
   function init() {
+    // Убираем старую кнопку Discord
+    discordLoginBtn.addEventListener("click", (e) => e.preventDefault());
+
+    logoutBtn.addEventListener("click", () => {
+      clearSession();
+      showAuth();
+      document.getElementById('statusUserBlock').classList.add('hidden');
+    });
+
+    const session = loadSession();
+    if (session) {
+      showDesk(session);
+    } else {
+      showAuth();
+    }
+      document.getElementById('usersScreen').addEventListener('click', (e) => {
+    // Если кликнули на фон, но не на кнопки внутри
+    if (e.target.id === 'usersScreen') {
+       document.getElementById('usersScreen').classList.add('hidden');
+       document.getElementById('deskScreen').classList.remove('hidden');
+    }
+  });
+  }
+
+    // ============================================================
+  //  СИСТЕМА УЧЁТНЫХ ЗАПИСЕЙ (АДМИНКА)
+  // ============================================================
+  const USERS_DB_KEY = "hospital_users_db";
+
+  function getUsersDB() {
+    try {
+      const raw = localStorage.getItem(USERS_DB_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    // Если база пустая, создаем дефолтного Todd
+    return [{ login: 'todd', hash: TEMP_PASSWORD_HASH, role: 'Бог', isTemp: true }];
+  }
+
+  function saveUsersDB(db) {
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+  }
+
+  function showUsersScreen() {
+    document.getElementById('deskScreen').classList.add('hidden');
+    document.getElementById('usersScreen').classList.remove('hidden');
+    renderUsersList();
+  }
+
+  function renderUsersList() {
+    const list = document.getElementById('usersList');
+    const db = getUsersDB();
+    
+    if (db.length === 0) {
+      list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted);">Нет пользователей</div>';
+      return;
+    }
+
+    list.innerHTML = db.map(u => `
+      <div class="user-row">
+        <div class="user-info-col">
+          <span class="user-login-text">${u.login}</span>
+          <span class="user-role-text">Роль: ${u.role} ${u.isTemp ? '(Временный пароль)' : ''}</span>
+        </div>
+        <div class="user-actions">
+          <button class="btn-small" onclick="editUser('${u.login}')">Изменить</button>
+          <button class="btn-small btn-danger" onclick="deleteUser('${u.login}')">Удалить</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Открытие формы создания/редактирования
+  document.getElementById('addUserBtn').addEventListener('click', () => {
+    document.getElementById('userFormTitle').textContent = "Новый пользователь";
+    document.getElementById('editUserLogin').value = "";
+    document.getElementById('newUserLogin').value = "";
+    document.getElementById('newUserPassword').value = "12345";
+    document.getElementById('newUserRole').value = "Сотрудник";
+    document.getElementById('newUserLogin').disabled = false;
+    document.getElementById('userFormBlock').classList.remove('hidden');
+  });
+
+  document.getElementById('cancelUserBtn').addEventListener('click', () => {
+    document.getElementById('userFormBlock').classList.add('hidden');
+  });
+
+  // Сохранение (Создание или Изменение)
+  document.getElementById('saveUserBtn').addEventListener('click', async () => {
+    const editLogin = document.getElementById('editUserLogin').value;
+    const login = document.getElementById('newUserLogin').value.trim().toLowerCase();
+    const pass = document.getElementById('newUserPassword').value;
+    const role = document.getElementById('newUserRole').value;
+
+    if (!login || !pass) return alert("Заполните логин и пароль");
+
+    let db = getUsersDB();
+    const hash = await sha256Hex(pass);
+
+    if (editLogin) {
+      // РЕДАКТИРОВАНИЕ
+      const idx = db.findIndex(u => u.login === editLogin);
+      if (idx !== -1) {
+        db[idx].role = role;
+        if (pass) {
+          db[idx].hash = hash;
+          db[idx].isTemp = true; // При смене пароля админом, ставим галочку "временный"
+        }
+      }
+    } else {
+      // СОЗДАНИЕ
+      if (db.find(u => u.login === login)) return alert("Пользователь с таким логином уже есть");
+      db.push({ login, hash, role, isTemp: true });
+    }
+
+    saveUsersDB(db);
+    document.getElementById('userFormBlock').classList.add('hidden');
+    renderUsersList();
+  });
+
+  // Глобальные функции для кнопок списка
+  window.editUser = (login) => {
+    const db = getUsersDB();
+    const u = db.find(x => x.login === login);
+    if (!u) return;
+
+    document.getElementById('userFormTitle').textContent = "Редактировать: " + login;
+    document.getElementById('editUserLogin').value = login;
+    document.getElementById('newUserLogin').value = login;
+    document.getElementById('newUserLogin').disabled = true; // Логин менять нельзя
+    document.getElementById('newUserPassword').value = ""; // Пароль пустой (не менять)
+    document.getElementById('newUserPassword').placeholder = "Оставьте пустым, чтобы не менять";
+    document.getElementById('newUserRole').value = u.role;
+    document.getElementById('userFormBlock').classList.remove('hidden');
+  };
+
+  window.deleteUser = (login) => {
+    if (login === 'todd') return alert("Нельзя удалить главного администратора!");
+    if (!confirm(`Удалить пользователя ${login}?`)) return;
+    
+    let db = getUsersDB();
+    db = db.filter(u => u.login !== login);
+    saveUsersDB(db);
+    renderUsersList();
+  };
+
+  document.addEventListener("DOMContentLoaded", init); {
     // Кнопка Discord (заглушка для этого теста)
     discordLoginBtn.addEventListener("click", (e) => {
       e.preventDefault();
