@@ -5,52 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Недельный отчет (Премии)</title>
 <style>
-  /* ============ БАЗА И ЦВЕТА (взято из твоего файла) ============ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0b0f14; --bg-2: #111823; --panel: #16202e; --panel-2: #1c2839; --panel-3: #223147;
+    --bg: #0b0f14; --panel: #16202e; --panel-2: #1c2839; --panel-3: #223147;
     --text: #e8eef7; --muted: #8496ab; --border: #26344a; --border-strong: #3a4d6b;
     --accent: #2f9e44; --accent-2: #37b24d; --accent-bg: rgba(47,158,68,0.12); --accent-border: rgba(47,158,68,0.5);
-    --blue: #3b82f6; --blue-bg: rgba(59,130,246,0.14); --blue-border: rgba(59,130,246,0.5);
     --amber: #f59e0b; --amber-bg: rgba(245,158,11,0.12); --amber-border: rgba(245,158,11,0.5);
     --red: #ef4444; --red-bg: rgba(239,68,68,0.12); --red-border: rgba(239,68,68,0.5);
     --input-bg: #0c1420; --table-hover: rgba(47,158,68,0.04);
-    --card-bg: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
-    --shadow-card: 0 6px 20px rgba(0,0,0,0.3);
   }
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%);
-    color: var(--text); min-height: 100vh; padding: 16px;
-  }
+  body { font-family: system-ui, sans-serif; background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%); color: var(--text); min-height: 100vh; padding: 16px; }
   .wrap { max-width: 1100px; margin: 0 auto; }
   
-  /* Шапка */
   .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
   .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
 
-  /* Вкладки */
   .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
-  .tab-btn {
-    display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px;
-    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text); font-size: 0.86rem; font-weight: 600; cursor: pointer;
-  }
+  .tab-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 0.86rem; font-weight: 600; cursor: pointer; }
   .tab-btn.active { background: var(--accent-bg); border-color: var(--accent-border); color: #86efac; }
   .tab-btn .count { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; }
 
-  /* Карточки и таблица */
-  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow-card); }
+  .card { background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
   .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .card-head h2 { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
   .toolbar { display: grid; grid-template-columns: 1fr 200px 150px; gap: 8px; margin-bottom: 12px; }
-  @media (max-width: 720px) { .toolbar { grid-template-columns: 1fr; } }
-  
-  input[type="text"], select {
-    width: 100%; padding: 9px 12px; font-size: 0.88rem; color: var(--text);
-    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; outline: none;
-  }
+  input[type="text"], select { width: 100%; padding: 9px 12px; font-size: 0.88rem; color: var(--text); background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; outline: none; }
 
   .tbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   .tbl th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); padding: 9px 10px; border-bottom: 1px solid var(--border); }
@@ -58,16 +38,29 @@
   .tbl tr:hover { background: var(--table-hover); }
   
   .col-pass { color: #86efac; font-weight: 700; }
-  .col-num { color: var(--muted); width: 40px; }
-  
   .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 700; }
   .status-pill.ok { background: var(--accent-bg); color: #86efac; border: 1px solid var(--accent-border); }
   .status-pill.warn { background: var(--amber-bg); color: #fcd34d; border: 1px solid var(--amber-border); }
 
   .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
   .btn-icon.star { color: #fbbf24; border-color: #fbbf24; }
-  .btn-icon.active { background: #fbbf24; color: #1a1207; }
 
+  /* Кнопка открытия премий */
+  .btn-premium {
+    background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a1207;
+    border: none; border-radius: 8px; padding: 8px 16px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+  }
+
+  /* Модалка премий */
+  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-bonus { width: 100%; max-width: 800px; background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%); border: 1px solid var(--border-strong); border-radius: 16px; padding: 20px; }
+  
+  .bonus-section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .bonus-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--panel-3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+  .bonus-item .b-name { font-weight: 700; font-size: 0.95rem; }
+  .bonus-item .b-meta { font-size: 0.75rem; color: var(--muted); }
+  .btn-copy-bonus { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 14px; background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a1207; font-size: 1rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -79,22 +72,21 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Назад
     </button>
-    <h2 style="margin:0; font-size:1.1rem;">Недельный отчет (Премии)</h2>
+    <h2 style="margin:0; font-size:1.1rem;">Недельный отчет</h2>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" data-tab="current">
-      Текущая неделя <span class="count" id="countTotal">0</span>
-    </button>
-    <button class="tab-btn" data-tab="debtors">
-      Ожидают премию <span class="count" id="countPending">0</span>
-    </button>
+    <button class="tab-btn active" data-tab="current">Текущая неделя <span class="count" id="countTotal">0</span></button>
+    <button class="tab-btn" data-tab="debtors">Ожидают премию <span class="count" id="countPending">0</span></button>
   </div>
 
   <div class="card" id="tab-current">
     <div class="card-head">
       <h2>Список сотрудников</h2>
-      <button class="btn-icon" onclick="loadData()" title="Обновить">🔄</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-premium" onclick="openBonusModal()">⭐ Премии</button>
+        <button class="btn-icon" onclick="loadData()" title="Обновить">🔄</button>
+      </div>
     </div>
 
     <div class="toolbar">
@@ -109,22 +101,58 @@
       </div>
     </div>
 
-    <div id="tableContainer">
-      <div style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>
+    <div id="tableContainer"></div>
+  </div>
+</div>
+
+<!-- МОДАЛКА ПРЕМИЙ -->
+<div class="modal-back hidden" id="bonusModal">
+  <div class="modal-bonus">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+      <h3 style="font-size:1.1rem; display:flex; align-items:center; gap:8px;">⭐ Премии недели</h3>
+      <button style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;" onclick="closeBonusModal()">×</button>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+      <button style="background:var(--accent-bg); border:1px solid var(--accent-border); color:#86efac; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">Общая премия</button>
+      <button style="background:transparent; border:none; color:var(--muted); font-weight:bold; cursor:pointer;">Премия для сотрудников</button>
+    </div>
+
+    <div class="bonus-section-title">Сколько премий выдать на этой неделе</div>
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <input type="number" id="bonusCountInput" min="1" value="10" style="max-width:200px;">
+      <button class="btn-primary" onclick="confirmBonusCount()" style="padding:0 20px; font-weight:bold;">Подтвердить</button>
+    </div>
+
+    <div id="bonusResultBlock" class="hidden">
+      <div class="bonus-section-title">Список на премию</div>
+      <div id="bonusList" style="margin-bottom:15px;"></div>
+
+      <div class="bonus-section-title">Добавить сотрудника вручную</div>
+      <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <input type="text" id="bonusAddInput" placeholder="Начните вводить имя...">
+        <button class="btn-primary" onclick="addManualBonus()" style="padding:0 20px;">+ Добавить</button>
+      </div>
+
+      <button class="btn-copy-bonus" onclick="copyGeneralBonusList()">
+        📋 Скопировать списки на премию
+      </button>
     </div>
   </div>
 </div>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  // Убедись, что адрес правильный!
-  const WORKER_URL = "https://goverment.vadrgnuil.workers.dev";
+  const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
+  
   let allReports = [];
+  let allStaff = []; // Наш "Персонал Gov"
+  let bonusList = [];
 
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
   async function loadData() {
-    $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>';
+    $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px;">Загрузка...</div>';
     try {
       const res = await fetch(WORKER_URL, {
         method: "POST",
@@ -132,16 +160,21 @@
         body: JSON.stringify({ action: "getReports" })
       });
       const data = await res.json();
+      allReports = data.reports || [];
       
-      if (data.success) {
-        allReports = data.reports || [];
-        updateCounts();
-        renderTable();
-      } else {
-        $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--red);">Ошибка данных</div>';
-      }
+      // Загружаем персонал для ручного добавления
+      const resStaff = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "getUsers" })
+      });
+      const dataStaff = await resStaff.json();
+      allStaff = dataStaff.users || [];
+
+      updateCounts();
+      renderTable();
     } catch(e) {
-      $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--red);">Ошибка сети</div>';
+      $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка сети</div>';
     }
   }
 
@@ -171,13 +204,13 @@
       <table class="tbl">
         <thead>
           <tr>
-            <th class="col-num">#</th>
+            <th>#</th>
             <th>Имя</th>
-            <th class="col-hide-sm">Паспорт</th>
-            <th class="col-rank">Должность</th>
-            <th style="text-align:center;">Сумма</th>
-            <th style="text-align:center;">Статус</th>
-            <th style="text-align:right;">Действие</th>
+            <th>Паспорт</th>
+            <th>Должность</th>
+            <th>Сумма</th>
+            <th>Статус</th>
+            <th>Действие</th>
           </tr>
         </thead>
         <tbody>
@@ -187,26 +220,15 @@
       const isApproved = r.status === 'approved';
       html += `
         <tr>
-          <td class="col-num">${i + 1}</td>
+          <td>${i + 1}</td>
           <td style="font-weight:600;">${r.employee_name}</td>
           <td class="col-pass">${r.passport || '—'}</td>
-          <td style="color:var(--muted);">${r.role || '—'}</td>
-          <td style="text-align:center;font-weight:700;color:#86efac;">${r.total_sum.toLocaleString('ru-RU')} $</td>
-          <td style="text-align:center;">
-            ${isApproved 
-              ? '<span class="status-pill ok">✅ Получил</span>' 
-              : '<span class="status-pill warn">⏳ Ожидает</span>'}
-          </td>
-          <td style="text-align:right; white-space:nowrap;">
-            <!-- Кнопка звездочки (Премия) -->
-            <button class="btn-icon ${isApproved ? 'active' : ''}" onclick="approveBonus(${r.id}, ${isApproved})" title="Начислить премию" style="margin-right:5px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="${isApproved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </button>
-            
-            <!-- НОВАЯ Кнопка удаления (Корзина) -->
-            <button class="btn-icon" onclick="deleteReport(${r.id})" title="Удалить из списка" style="color:#fca5a5; border-color:rgba(239,68,68,0.3);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-            </button>
+          <td>${r.role || '—'}</td>
+          <td style="font-weight:700;color:#86efac;">${r.total_sum} $</td>
+          <td>${isApproved ? '<span class="status-pill ok">✅ Получил</span>' : '<span class="status-pill warn">⏳ Ожидает</span>'}</td>
+          <td style="text-align:right;">
+            <button class="btn-icon star" onclick="toggleBonusFromReport('${r.employee_name}')" title="Добавить в премию">⭐</button>
+            <button class="btn-icon" onclick="deleteReport(${r.id})" title="Удалить" style="color:#fca5a5;">🗑️</button>
           </td>
         </tr>
       `;
@@ -216,57 +238,121 @@
     $("tableContainer").innerHTML = html;
   }
 
-  window.approveBonus = async (id, isApproved) => {
-    if (isApproved) return; // Уже начислено
-    if (!confirm("Начислить премию этому сотруднику?")) return;
+  // Открытие модалки
+  window.openBonusModal = () => {
+    $("bonusModal").classList.remove("hidden");
+    if (bonusList.length > 0) $("bonusResultBlock").classList.remove("hidden");
+  };
+  window.closeBonusModal = () => $("bonusModal").classList.add("hidden");
+
+  window.confirmBonusCount = () => {
+    const count = parseInt($("bonusCountInput").value) || 10;
+    const candidates = allReports
+      .filter(r => r.status !== 'deleted')
+      .sort((a, b) => b.total_sum - a.total_sum)
+      .slice(0, count);
+
+    bonusList = candidates.map(r => r.employee_name);
+    renderBonusList();
+    $("bonusResultBlock").classList.remove("hidden");
+  };
+
+  window.toggleBonusFromReport = (name) => {
+    if (!bonusList.includes(name)) {
+      bonusList.push(name);
+    }
+    openBonusModal();
+    renderBonusList();
+    $("bonusResultBlock").classList.remove("hidden");
+  };
+
+  function renderBonusList() {
+    if (bonusList.length === 0) {
+      $("bonusList").innerHTML = '<div style="color:var(--muted);">Список пуст</div>';
+      return;
+    }
+
+    $("bonusList").innerHTML = bonusList.map((name, i) => {
+      const info = allStaff.find(s => s.login === name) || {};
+      const r = allReports.find(x => x.employee_name === name) || {};
+      
+      return `
+        <div class="bonus-item">
+          <div>
+            <div class="b-name">${name}</div>
+            <div class="b-meta">Паспорт: ${r.passport || '—'} · Роль: ${info.role || '—'} · Ранг: ${info.rank || '—'}</div>
+          </div>
+          <button style="background:var(--red-bg); color:#fca5a5; border:1px solid var(--red-border); padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="removeFromBonus(${i})">Убрать</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.removeFromBonus = (index) => {
+    bonusList.splice(index, 1);
+    renderBonusList();
+  };
+
+  window.addManualBonus = () => {
+    const val = $("bonusAddInput").value.trim().toLowerCase();
+    if (!val) return;
     
-    try {
-      await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "approveBonus", id: id })
-      });
-      loadData();
-    } catch(e) {
-      alert("Ошибка сети!");
+    const found = allStaff.find(s => s.login.toLowerCase().includes(val));
+    if (found && !bonusList.includes(found.login)) {
+      bonusList.push(found.login);
+      renderBonusList();
+      $("bonusAddInput").value = "";
+    } else {
+      alert("Сотрудник не найден или уже в списке");
     }
   };
 
+  // КОПИРОВАНИЕ В ТОЧНОМ ФОРМАТЕ
+  window.copyGeneralBonusList = () => {
+    if (bonusList.length === 0) return alert("Список пуст!");
+
+    const lines = bonusList.map(name => {
+      const staff = allStaff.find(s => s.login === name) || {};
+      const report = allReports.find(r => r.employee_name === name) || {};
+      
+      // Формат: Brilliant Motez.24195.Ранг 17 | Зам. Глава Коллегии Адв.1111
+      const passport = report.passport || staff.passport || "—";
+      const rank = staff.rank ? `Ранг ${staff.rank}` : "Ранг —";
+      const role = report.role || staff.role || "Сотрудник";
+      const seniority = staff.seniority || "0"; 
+
+      return `${name}.${passport}.${rank} | ${role}.${seniority}`;
+    });
+
+    const finalText = "```\n" + lines.join("\n") + "\n```";
+    
+    navigator.clipboard.writeText(finalText).then(() => {
+      alert("✅ Списки скопированы!\n\n" + finalText);
+    }).catch(() => {
+      alert("Ошибка копирования");
+    });
+  };
+
+  window.deleteReport = async (id) => {
+    if (!confirm("Удалить?")) return;
+    await fetch(WORKER_URL, { method: "POST", body: JSON.stringify({ action: "deleteReport", id }) });
+    loadData();
+  };
+
+  // Слушатели
   $("searchInput").addEventListener("input", renderTable);
   $("filterStatus").addEventListener("change", renderTable);
-
-  // Переключение вкладок (просто меняем фильтр)
+  
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
-      if (btn.dataset.tab === 'debtors') {
-        $("filterStatus").value = "pending";
-      } else {
-        $("filterStatus").value = "all";
-      }
+      $("filterStatus").value = btn.dataset.tab === 'debtors' ? 'pending' : 'all';
       renderTable();
     });
   });
 
-  // Запуск
   loadData();
-
-    window.deleteReport = async (id) => {
-    if (!confirm("Вы уверены, что хотите удалить этого сотрудника из отчета?")) return;
-    
-    try {
-      await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "deleteReport", id: id })
-      });
-      loadData(); // Перезагружаем список
-    } catch(e) {
-      alert("Ошибка сети!");
-    }
-};
 </script>
 </body>
 </html>
