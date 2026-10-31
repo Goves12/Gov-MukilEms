@@ -127,7 +127,7 @@
     border: 1px solid rgba(255,255,255,.12); border-radius: 12px; font-size: 15px; font-weight: 700;
     font-family: inherit; cursor: pointer; transition: background .2s, transform .1s;
   }
-  .btn-discord:hover { background: #4752c4; transform: translateY(-1px); }
+  .btn-discord svg { width: 24px; height: 24px; flex-shrink: 0; fill: currentColor; }
 
   .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
   .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
@@ -545,7 +545,7 @@
     // Кнопка Discord (заглушка для этого теста)
     discordLoginBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      alert("Вход через Discord будет добавлен позже. Используйте логин Todd и пароль 12345.");
+      alert("Вход через Discord будет добавлен позже.");
     });
 
     // Выход
