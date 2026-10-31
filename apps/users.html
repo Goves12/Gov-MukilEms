@@ -11,15 +11,26 @@
     --border: #26344a; --border-strong: #3a4a66; --accent: #2f9e44;
     --error-bg: #4c1d1d; --error-text: #fecaca;
   }
-  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 0; }
+  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
   
+  /* Шапка */
   .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .header-row h2 { font-size: 1.1rem; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  
+  .btn-back {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; background: #1c2839; border: 1px solid var(--border);
+    border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-back:hover { background: #26344a; }
+  
   .btn-primary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
   
-  .user-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--panel-2); }
-  .user-row:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
-  .user-row:last-child { border-bottom: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+  /* Список */
+  #usersList { border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2); overflow: hidden; }
+  .user-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .user-row:last-child { border-bottom: none; }
   .user-info { display: flex; flex-direction: column; gap: 4px; }
   .user-login { font-weight: 600; font-size: 0.95rem; }
   .user-role { font-size: 0.75rem; color: var(--muted); }
@@ -27,6 +38,7 @@
   .btn-small { padding: 6px 12px; font-size: 0.75rem; border-radius: 8px; background: var(--border); color: var(--text); border: none; cursor: pointer; }
   .btn-danger { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
   
+  /* Форма */
   .form-group { margin-bottom: 12px; }
   label { display: block; font-size: 0.72rem; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
   input, select { width: 100%; padding: 10px; font-size: 0.95rem; background: #0d1520; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
@@ -37,24 +49,19 @@
 </head>
 <body>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-  <div style="display:flex; align-items:center; gap:12px;">
-    <!-- КНОПКА НАЗАД -->
-    <button id="backBtn" style="display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--border); border:none; border-radius:8px; color:white; cursor:pointer; font-weight:600;">
+<!-- Шапка с кнопкой Назад -->
+<div class="header-row">
+  <div class="header-left">
+    <button class="btn-back" id="backBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Назад
     </button>
-    <h2 style="margin:0; font-size:1.1rem;">Пользователи</h2>
+    <h2 style="font-size:1.1rem; margin:0;">Пользователи</h2>
   </div>
-  <button class="btn-primary" id="addUserBtn" style="width:auto;">+ Добавить</button>
-</div> 
-
-<div class="header-row">
-  <h2>Пользователи</h2>
   <button class="btn-primary" id="addUserBtn">+ Добавить</button>
 </div>
 
-<div id="usersList" style="border: 1px solid var(--border); border-radius: 12px;"></div>
+<div id="usersList"></div>
 
 <div id="userFormBlock" class="hidden">
   <h3 id="userFormTitle" style="margin-bottom:15px; font-size:1rem;">Новый пользователь</h3>
@@ -70,6 +77,16 @@
       <option value="Бог">Бог</option>
     </select>
   </div>
+  <div class="form-group"><label>Отдел</label>
+    <select id="newUserDepartment">
+      <option value="Руководство">Руководство</option>
+      <option value="АБ">Администрация больницы</option>
+      <option value="ОК">Отдел кадров</option>
+      <option value="СМП">Скорая помощь (СМП)</option>
+      <option value="ИТ">Интенсивная терапия</option>
+      <option value="ПСЭС">ПСЭС</option>
+    </select>
+  </div>
   <div style="display:flex; gap:10px; margin-top:15px;">
     <button class="btn-primary" id="saveUserBtn" style="flex:1;">Сохранить</button>
     <button class="btn-primary" id="cancelUserBtn" style="flex:1; background:#64748b;">Отмена</button>
@@ -77,21 +94,18 @@
 </div>
 
 <script>
-  // Этот скрипт работает независимо внутри iframe
   const $ = (id) => document.getElementById(id);
-  const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; // Твой адрес
-  // Кнопка назад
+
+  // 1. Кнопка Назад
   $("backBtn").addEventListener("click", () => {
-    // Отправляем сообщение главному окну, чтобы оно вернуло рабочий стол
     window.parent.postMessage({ action: "goBack" }, "*");
   });
-  
-  // Временная локальная база (пока не перенесли это в Cloudflare)
+
+  // Временная локальная база (для теста)
   const USERS_DB_KEY = "hospital_users_db_v2";
   function getUsersDB() { return JSON.parse(localStorage.getItem(USERS_DB_KEY) || "[]"); }
   function saveUsersDB(db) { localStorage.setItem(USERS_DB_KEY, JSON.stringify(db)); }
 
-  // Хэширование
   async function sha256Hex(text) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
@@ -108,7 +122,7 @@
       <div class="user-row">
         <div class="user-info">
           <span class="user-login">${u.login}</span>
-          <span class="user-role">Роль: ${u.role} ${u.isTemp ? '(временный пароль)' : ''}</span>
+          <span class="user-role">Роль: ${u.role} ${u.department ? '· Отдел: ' + u.department : ''} ${u.isTemp ? '(врем. пароль)' : ''}</span>
         </div>
         <div style="display:flex; gap:8px;">
           <button class="btn-small" onclick="editUser('${u.login}')">Изменить</button>
@@ -118,25 +132,25 @@
     `).join('');
   }
 
-  // Добавление
   $("addUserBtn").addEventListener("click", () => {
     $("userFormTitle").textContent = "Новый пользователь";
     $("editUserLogin").value = "";
     $("newUserLogin").value = "";
     $("newUserPassword").value = "12345";
     $("newUserRole").value = "Сотрудник";
+    $("newUserDepartment").value = "СМП";
     $("newUserLogin").disabled = false;
     $("userFormBlock").classList.remove("hidden");
   });
 
   $("cancelUserBtn").addEventListener("click", () => $("userFormBlock").classList.add("hidden"));
 
-  // Сохранение
   $("saveUserBtn").addEventListener("click", async () => {
     const editLogin = $("editUserLogin").value;
     const login = $("newUserLogin").value.trim().toLowerCase();
     const pass = $("newUserPassword").value;
     const role = $("newUserRole").value;
+    const department = $("newUserDepartment").value;
 
     if (!login) return alert("Введите логин");
     let db = getUsersDB();
@@ -145,6 +159,7 @@
       const idx = db.findIndex(u => u.login === editLogin);
       if (idx !== -1) {
         db[idx].role = role;
+        db[idx].department = department;
         if (pass) {
           db[idx].hash = await sha256Hex(pass);
           db[idx].isTemp = true;
@@ -153,7 +168,7 @@
     } else {
       if (!pass) return alert("Введите пароль");
       if (db.find(u => u.login === login)) return alert("Логин занят");
-      db.push({ login, hash: await sha256Hex(pass), role, isTemp: true });
+      db.push({ login, hash: await sha256Hex(pass), role, department, isTemp: true });
     }
 
     saveUsersDB(db);
@@ -161,7 +176,6 @@
     renderUsersList();
   });
 
-  // Глобальные функции для кнопок
   window.editUser = (login) => {
     const u = getUsersDB().find(x => x.login === login);
     if (!u) return;
@@ -172,6 +186,7 @@
     $("newUserPassword").value = "";
     $("newUserPassword").placeholder = "Оставьте пустым, чтобы не менять";
     $("newUserRole").value = u.role;
+    $("newUserDepartment").value = u.department || "СМП";
     $("userFormBlock").classList.remove("hidden");
   };
 
@@ -184,7 +199,6 @@
     renderUsersList();
   };
 
-  // Старт
   renderUsersList();
 </script>
 </body>
