@@ -256,12 +256,17 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          // Передаем логин и роль в URL для iframe
           $("appIframe").src = `apps/about.html?user=${session.login}&role=${session.role}`; 
         }
         else if (a.id === 'calc') {
-          window.open("calculator.html", "_blank");
-        } 
+          // Открываем калькулятор в iframe!
+          $("authScreen").classList.add("hidden"); 
+          $("deskScreen").classList.add("hidden");
+          $("appFrame").classList.remove("hidden");
+          $("appHeader").classList.remove("hidden"); 
+          $("currentAppTitle").textContent = a.label; 
+          $("appIframe").src = "apps/calculator.html"; 
+        }
         else {
           alert("Раздел в разработке");
         }

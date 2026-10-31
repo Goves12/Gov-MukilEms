@@ -3,366 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💰 Калькулятор денег</title>
+<title>Калькулятор отчетов</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
+  :root {
+    --bg: #0b0f14; --panel-2: #1c2839; --text: #e8eef7; --muted: #8496ab;
+    --border: #26344a; --accent: #2f9e44; --blue: #3b82f6;
   }
+  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
   
-  .app {
-    width: 100%;
-    max-width: 700px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    overflow: hidden;
+  /* Шапка */
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .btn-back {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; background: #1c2839; border: 1px solid var(--border);
+    border-radius: 8px; color: white; cursor: pointer; font-weight: 600; font-family: inherit;
   }
+  .btn-back:hover { background: #26344a; }
+
+  /* Карточки */
+  .card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .card h3 { font-size: 1.05rem; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
   
-  header {
-    background: linear-gradient(135deg, #11998e, #38ef7d);
-    color: #fff;
-    padding: 24px;
-    text-align: center;
-  }
-  
-  header h1 { font-size: 24px; margin-bottom: 4px; }
-  header p { font-size: 13px; opacity: 0.9; }
-  
-  .total-box {
-    background: #f7f9fc;
-    padding: 24px;
-    text-align: center;
-    border-bottom: 1px solid #e1e8ed;
-  }
-  
-  .total-label {
-    font-size: 13px;
-    color: #8899a6;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-  
-  .total-value {
-    font-size: 42px;
-    font-weight: 800;
-    color: #11998e;
-    transition: transform 0.15s;
-  }
-  
-  .total-value.bump { transform: scale(1.08); }
-  
-  .sections { padding: 20px; }
-  
-  .section-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #333;
-    margin: 20px 0 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .section-title:first-child { margin-top: 0; }
-  
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-  }
-  
-  .item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f7f9fc;
-    border-radius: 12px;
-    padding: 10px;
-    transition: background 0.2s;
-  }
-  
-  .item:focus-within { background: #e8f5f1; }
-  
-  .item .nominal {
-    flex: 1;
-    font-weight: 700;
-    font-size: 14px;
-    color: #333;
-    white-space: nowrap;
-  }
-  
-  .item input {
-    width: 52px;
-    padding: 6px;
-    border: 1px solid #ccd6dd;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: #11998e;
-    outline: none;
-  }
-  
-  .item input:focus { border-color: #11998e; }
-  
-  /* Убираем стрелки у number */
-  .item input::-webkit-outer-spin-button,
-  .item input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .item input[type=number] { -moz-appearance: textfield; }
-  
-  .item .subtotal {
-    font-size: 11px;
-    color: #8899a6;
-    min-width: 38px;
-    text-align: right;
-  }
-  
-  .actions {
-    display: flex;
-    gap: 12px;
-    padding: 20px;
-    background: #f7f9fc;
-    border-top: 1px solid #e1e8ed;
-  }
-  
-  button {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .btn-reset {
-    background: #fff;
-    color: #e74c3c;
-    border: 1px solid #e74c3c;
-  }
-  .btn-reset:hover { background: #e74c3c; color: #fff; }
-  
-  .btn-copy {
-    background: linear-gradient(135deg, #11998e, #38ef7d);
-    color: #fff;
-  }
-  .btn-copy:hover { opacity: 0.9; transform: translateY(-1px); }
-  
-  /* Разбивка */
-  .breakdown {
-    padding: 0 20px 20px;
-    display: none;
-  }
-  .breakdown.show { display: block; }
-  .breakdown h3 {
-    font-size: 14px;
-    color: #555;
-    margin: 12px 0 8px;
-  }
-  .breakdown-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    font-size: 13px;
-    border-bottom: 1px dashed #e1e8ed;
-  }
-  .breakdown-row span:last-child { font-weight: 600; color: #11998e; }
-  
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: #333;
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-size: 14px;
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  
-  @media (max-width: 480px) {
-    .total-value { font-size: 32px; }
-    .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-  }
+  .form-group { margin-bottom: 12px; }
+  label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
+  input { width: 100%; padding: 10px; font-size: 0.95rem; background: #0d1520; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
+  input:focus { border-color: var(--accent); outline: none; }
+
+  /* Услуги */
+  .service-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .service-row:last-child { border-bottom: none; }
+  .service-name { font-size: 0.9rem; flex: 1; padding-right: 10px; }
+  .service-price { font-weight: 600; color: var(--accent); min-width: 80px; text-align: right; margin-right: 15px; }
+  .service-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
+
+  /* Итог */
+  .total-box { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 2px dashed var(--border); }
+  .total-label { font-size: 1.1rem; font-weight: 700; }
+  .total-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+
+  /* Кнопка */
+  .btn-primary { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; }
+  .btn-primary:hover { background: #37b24d; }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header>
-    <h1>💰 Калькулятор денег</h1>
-    <p>Введи количество купюр и монет</p>
-  </header>
-  
-  <div class="total-box">
-    <div class="total-label">Итого</div>
-    <div class="total-value" id="total">0 ₽</div>
+<div class="header-row">
+  <button class="btn-back" id="backBtn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <h2 style="margin:0; font-size:1.1rem;">Калькулятор доходов</h2>
+</div>
+
+<!-- Данные сотрудника -->
+<div class="card">
+  <h3>Данные сотрудника</h3>
+  <div class="form-group">
+    <label>Фамилия и Имя</label>
+    <input type="text" id="empName" placeholder="Иванов Иван">
   </div>
-  
-  <div class="sections">
-    <div class="section-title">💵 Купюры</div>
-    <div class="grid" id="bills"></div>
-    
-    <div class="section-title">🪙 Монеты</div>
-    <div class="grid" id="coins"></div>
-  </div>
-  
-  <div class="breakdown" id="breakdown"></div>
-  
-  <div class="actions">
-    <button class="btn-reset" onclick="resetAll()">🗑 Очистить</button>
-    <button class="btn-copy" onclick="copyResult()">📋 Копировать итог</button>
+  <div class="form-group">
+    <label>Номер паспорта</label>
+    <input type="text" id="empPassport" placeholder="1234 567890">
   </div>
 </div>
 
-<div class="toast" id="toast">Скопировано!</div>
+<!-- Услуги -->
+<div class="card">
+  <h3>Выполненные работы (Минздрав)</h3>
+  <div id="servicesList">
+    <!-- Сюда будут вставляться услуги через JS -->
+  </div>
+  
+  <div class="total-box">
+    <span class="total-label">Итого к оплате:</span>
+    <span class="total-value" id="totalSum">0 $</span>
+  </div>
+</div>
+
+<button class="btn-primary" id="generateBtn">Сформировать отчет</button>
+
+<!-- Модальное окно с результатом (появится поверх) -->
+<div id="resultModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; padding:20px; overflow-y:auto;">
+  <div style="background:var(--panel-2); border:1px solid var(--border); border-radius:16px; max-width:600px; margin:20px auto; padding:25px;">
+    <h2 style="text-align:center; margin-bottom:20px;">📄 Отчет о выполненных работах</h2>
+    <div id="reportContent" style="font-size:0.9rem; line-height:1.6;"></div>
+    
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="btn-primary" id="copyBtn" style="margin-top:0;">📋 Скопировать текст</button>
+      <button class="btn-primary" id="closeBtn" style="margin-top:0; background:#64748b;">Закрыть</button>
+    </div>
+  </div>
+</div>
 
 <script>
-  // Номиналы
-  const BILLS = [5000, 2000, 1000, 500, 200, 100, 50];
-  const COINS = [10, 5, 2, 1];
-  
-  // Хранилище значений
-  const values = {};
-  
-  function formatMoney(n) {
-    return n.toLocaleString('ru-RU') + ' ₽';
-  }
-  
-  // Создание поля для номинала
-  function createItem(nominal, container) {
-    const item = document.createElement('div');
-    item.className = 'item';
-    
-    const label = document.createElement('div');
-    label.className = 'nominal';
-    label.textContent = nominal >= 1 && nominal < 100 
-      ? nominal + ' ₽' 
-      : nominal + ' ₽';
-    
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = '0';
-    input.value = '0';
-    input.dataset.nominal = nominal;
-    input.addEventListener('input', () => {
-      const v = Math.max(0, parseInt(input.value) || 0);
-      input.value = v;
-      values[nominal] = v;
-      update();
-    });
-    
-    const sub = document.createElement('div');
-    sub.className = 'subtotal';
-    sub.id = 'sub-' + nominal;
-    sub.textContent = '0';
-    
-    item.appendChild(label);
-    item.appendChild(input);
-    item.appendChild(sub);
-    container.appendChild(item);
-  }
-  
-  // Инициализация
-  const billsEl = document.getElementById('bills');
-  const coinsEl = document.getElementById('coins');
-  BILLS.forEach(n => createItem(n, billsEl));
-  COINS.forEach(n => createItem(n, coinsEl));
-  
-  // Пересчёт
-  function update() {
+  const $ = (id) => document.getElementById(id);
+
+  // Кнопка назад
+  $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
+
+  // Список услуг с ценами (как ты просил)
+  const SERVICES = [
+    { id: "check_hosp", name: 'Проверка лечебного учреждения на наличие сотрудников', price: 8000 },
+    { id: "event_ems", name: 'Проведение мероприятия для EMS', price: 10000 },
+    { id: "social_ems", name: 'Проведение социального опроса для EMS', price: 6000 },
+    { id: "check_ems", name: 'Проведение проверки EMS', price: 10000 },
+    { id: "donor_day", name: 'Проведение Дня Донора', price: 15000 },
+    { id: "briefing", name: 'Участие в брифинге EMS', price: 2000 }
+  ];
+
+  // Отрисовка списка
+  const list = $("servicesList");
+  SERVICES.forEach(srv => {
+    const row = document.createElement("div");
+    row.className = "service-row";
+    row.innerHTML = `
+      <input type="checkbox" class="service-checkbox" data-id="${srv.id}" data-price="${srv.price}">
+      <span class="service-name">${srv.name}</span>
+      <span class="service-price">${srv.price.toLocaleString('ru-RU')} $</span>
+    `;
+    list.appendChild(row);
+  });
+
+  // Подсчет суммы
+  function calculateTotal() {
     let total = 0;
-    const breakdown = [];
-    
-    [...BILLS, ...COINS].forEach(nominal => {
-      const count = values[nominal] || 0;
-      const sum = count * nominal;
-      total += sum;
-      
-      // Обновляем подытог у поля
-      const subEl = document.getElementById('sub-' + nominal);
-      if (subEl) subEl.textContent = sum > 0 ? formatMoney(sum) : '0';
-      
-      if (count > 0) {
-        breakdown.push({ nominal, count, sum });
-      }
+    document.querySelectorAll('.service-checkbox:checked').forEach(cb => {
+      total += parseInt(cb.dataset.price);
     });
-    
-    // Анимация итога
-    const totalEl = document.getElementById('total');
-    totalEl.textContent = formatMoney(total);
-    totalEl.classList.add('bump');
-    setTimeout(() => totalEl.classList.remove('bump'), 150);
-    
-    // Разбивка
-    const bd = document.getElementById('breakdown');
-    if (breakdown.length > 0) {
-      bd.classList.add('show');
-      bd.innerHTML = '<h3>📊 Разбивка</h3>' +
-        breakdown.map(b => 
-          `<div class="breakdown-row">
-            <span>${b.count} × ${b.nominal} ₽</span>
-            <span>${formatMoney(b.sum)}</span>
-          </div>`
-        ).join('');
-    } else {
-      bd.classList.remove('show');
+    $("totalSum").textContent = total.toLocaleString('ru-RU') + " $";
+    return total;
+  }
+
+  document.querySelectorAll('.service-checkbox').forEach(cb => {
+    cb.addEventListener('change', calculateTotal);
+  });
+
+  // Генерация отчета
+  $("generateBtn").addEventListener("click", () => {
+    const name = $("empName").value.trim() || "Не указано";
+    const passport = $("empPassport").value.trim() || "Не указано";
+    const total = calculateTotal();
+
+    if (total === 0) {
+      alert("Выберите хотя бы одну выполненную работу!");
+      return;
     }
-  }
-  
-  // Сброс
-  function resetAll() {
-    document.querySelectorAll('.item input').forEach(inp => {
-      inp.value = '0';
+
+    // Собираем выбранные услуги
+    let servicesHTML = "";
+    let servicesText = "";
+    document.querySelectorAll('.service-checkbox:checked').forEach(cb => {
+      const parent = cb.closest('.service-row');
+      const srvName = parent.querySelector('.service-name').textContent;
+      const srvPrice = cb.dataset.price;
+      
+      servicesHTML += `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #26344a;">
+        <span>${srvName}</span>
+        <span style="font-weight:bold; color:var(--accent);">${parseInt(srvPrice).toLocaleString('ru-RU')} $</span>
+      </div>`;
+      
+      servicesText += `- ${srvName}: ${parseInt(srvPrice).toLocaleString('ru-RU')} $\n`;
     });
-    Object.keys(values).forEach(k => delete values[k]);
-    update();
-  }
-  
+
+    // Формируем красивый отчет
+    const reportHTML = `
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="font-size:1.1rem; font-weight:bold;">Министерство Здравоохранения</div>
+        <div style="font-size:0.85rem; color:var(--muted);">Финансовый отчет о работах</div>
+      </div>
+      <div style="margin-bottom:15px; background:#0d1520; padding:10px; border-radius:8px;">
+        <div><b>Сотрудник:</b> ${name}</div>
+        <div><b>Паспорт:</b> ${passport}</div>
+        <div><b>Дата:</b> ${new Date().toLocaleDateString('ru-RU')}</div>
+      </div>
+      <div style="margin-bottom:15px;">
+        <div style="font-weight:bold; margin-bottom:8px;">Выполненные работы:</div>
+        ${servicesHTML}
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-weight:bold; margin-top:15px; padding-top:15px; border-top:2px solid var(--border);">
+        <span>ИТОГО:</span>
+        <span style="color:var(--accent);">${total.toLocaleString('ru-RU')} $</span>
+      </div>
+    `;
+
+    $("reportContent").innerHTML = reportHTML;
+    $("resultModal").style.display = "block";
+
+    // Сохраняем текст для копирования
+    window._reportText = `МИНИСТЕРСТВО ЗДРАВООХРАНЕНИЯ\nОтчет о выполненных работах\n\nСотрудник: ${name}\nПаспорт: ${passport}\nДата: ${new Date().toLocaleDateString('ru-RU')}\n\nВыполненные работы:\n${servicesText}\nИТОГО К ОПЛАТЕ: ${total.toLocaleString('ru-RU')} $`;
+  });
+
   // Копирование
-  function copyResult() {
-    const total = document.getElementById('total').textContent;
-    const breakdown = [];
-    [...BILLS, ...COINS].forEach(nominal => {
-      const count = values[nominal] || 0;
-      if (count > 0) breakdown.push(`${count} × ${nominal} ₽ = ${count * nominal} ₽`);
+  $("copyBtn").addEventListener("click", () => {
+    navigator.clipboard.writeText(window._reportText).then(() => {
+      alert("Текст отчета скопирован в буфер обмена!");
     });
-    
-    const text = 'Сумма: ' + total + 
-      (breakdown.length ? '\n\n' + breakdown.join('\n') : '');
-    
-    navigator.clipboard.writeText(text).then(() => {
-      showToast('✅ Скопировано в буфер обмена');
-    }).catch(() => {
-      showToast('❌ Не удалось скопировать');
-    });
-  }
-  
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  }
-  
-  // Стартовый расчёт
-  update();
+  });
+
+  // Закрытие модалки
+  $("closeBtn").addEventListener("click", () => {
+    $("resultModal").style.display = "none";
+  });
 </script>
 </body>
 </html>
