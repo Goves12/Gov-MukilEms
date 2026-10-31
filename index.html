@@ -133,12 +133,12 @@
       <div class="app-grid" id="appGrid"></div>
     </div>
 
-    <!-- АДМИНКА -->
-    <div class="app-screen hidden" id="usersScreen">
-      <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-        <h2>Учётные записи</h2>
-        <button class="btn-primary" id="addUserBtn" style="width:auto; padding:8px 16px;">+ Добавить</button>
+        <!-- УНИВЕРСАЛЬНЫЙ ЭКРАН ДЛЯ ПРИЛОЖЕНИЙ -->
+    <div class="app-screen hidden" id="appFrame">
+      <div id="iframeContainer" style="width:100%; height: calc(100vh - 200px); background: #111823; border-radius: 16px; border: 1px solid var(--border); overflow: hidden;">
+        <iframe id="appIframe" src="about:blank" style="width:100%; height:100%; border:none;"></iframe>
       </div>
+    </div>
       <div id="usersList" style="background:var(--panel-2); border:1px solid var(--border); border-radius:12px;"></div>
       <div id="userFormBlock" class="hidden" style="margin-top:20px; background:var(--panel-2); padding:20px; border-radius:12px;">
         <h3 id="userFormTitle" style="margin-bottom:15px;">Новый пользователь</h3>
@@ -242,22 +242,36 @@
     $("greetingTitle").textContent = "Добро пожаловать, " + session.login;
     $("greetingSub").textContent = "Роль: " + session.role;
 
-    // Рисуем плитки
-    const grid = $("appGrid");
-    grid.innerHTML = "";
-    APPS.forEach(a => {
-      if (a.roles && !a.roles.includes(session.role)) return;
-      const tile = document.createElement("div");
-      tile.className = "app-tile";
-      tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
-      tile.addEventListener("click", () => {
-        if (a.id === 'users') showUsersScreen();
-        else if (a.id === 'calc') window.open("calculator.html", "_blank");
-        else alert("Раздел в разработке");
-      });
-      grid.appendChild(tile);
+      // Рисуем плитки
+  const grid = $("appGrid");
+  grid.innerHTML = "";
+  APPS.forEach(a => {
+    if (a.roles && !a.roles.includes(session.role)) return;
+    const tile = document.createElement("div");
+    tile.className = "app-tile";
+    tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
+    
+    // ВОТ ЭТОТ БЛОК МЫ ЗАМЕНЯЕМ
+    tile.addEventListener("click", () => {
+      if (a.id === 'users') {
+        // Открываем iframe с файлом apps/users.html
+        $("appHeader").classList.remove("hidden");
+        $("currentAppTitle").textContent = a.label;
+        $("deskScreen").classList.add("hidden");
+        $("appFrame").classList.remove("hidden");
+        $("appIframe").src = "apps/users.html"; 
+      } 
+      else if (a.id === 'calc') {
+        window.open("calculator.html", "_blank");
+      } 
+      else {
+        alert("Раздел в разработке");
+      }
     });
-  }
+    // КОНЕЦ ЗАМЕНЫ
+
+    grid.appendChild(tile);
+  });
 
   // --- ВХОД (СТУЧИМСЯ В CLOUDFLARE) ---
   $("loginForm").addEventListener("submit", async (e) => {
