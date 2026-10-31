@@ -37,6 +37,18 @@
 </head>
 <body>
 
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <!-- КНОПКА НАЗАД -->
+    <button id="backBtn" style="display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--border); border:none; border-radius:8px; color:white; cursor:pointer; font-weight:600;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Назад
+    </button>
+    <h2 style="margin:0; font-size:1.1rem;">Пользователи</h2>
+  </div>
+  <button class="btn-primary" id="addUserBtn" style="width:auto;">+ Добавить</button>
+</div> 
+
 <div class="header-row">
   <h2>Пользователи</h2>
   <button class="btn-primary" id="addUserBtn">+ Добавить</button>
@@ -68,7 +80,12 @@
   // Этот скрипт работает независимо внутри iframe
   const $ = (id) => document.getElementById(id);
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; // Твой адрес
-
+  // Кнопка назад
+  $("backBtn").addEventListener("click", () => {
+    // Отправляем сообщение главному окну, чтобы оно вернуло рабочий стол
+    window.parent.postMessage({ action: "goBack" }, "*");
+  });
+  
   // Временная локальная база (пока не перенесли это в Cloudflare)
   const USERS_DB_KEY = "hospital_users_db_v2";
   function getUsersDB() { return JSON.parse(localStorage.getItem(USERS_DB_KEY) || "[]"); }
