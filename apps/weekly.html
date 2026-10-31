@@ -12,6 +12,10 @@
   }
   body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
 
+  /* Кнопка назад */
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+  .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #1c2839; border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
+
   /* Верхние вкладки */
   .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
   .tab { 
@@ -25,7 +29,6 @@
   /* Основная панель */
   .main-panel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
   
-  /* Заголовок сотрудников */
   .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .panel-title { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: bold; }
   .panel-title svg { color: var(--accent); }
@@ -59,9 +62,18 @@
 </head>
 <body>
 
+<!-- Кнопка Назад -->
+<div class="header-row">
+  <button class="btn-back" id="backBtn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад
+  </button>
+  <h2 style="margin:0; font-size:1.1rem;">Недельный отчет</h2>
+</div>
+
 <!-- Вкладки -->
 <div class="tabs">
-  <div class="tab active" id="tabCurrent">Текущая неделя <span class="count" id="tabCount">0</span></div>
+  <div class="tab active">Текущая неделя <span class="count" id="tabCount">0</span></div>
   <div class="tab">Инструкторы СМП <span class="count">0</span></div>
   <div class="tab">Топ недели</div>
   <div class="tab">Должники <span class="count" id="tabDebtors">0</span></div>
@@ -118,7 +130,7 @@
   let allReports = [];
 
   // Кнопка назад
-  $("backBtn")?.addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
+  $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
   async function loadReports() {
     $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</td></tr>';
@@ -134,9 +146,11 @@
         allReports = data.reports || [];
         updateCounts();
         renderTable();
+      } else {
+        $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--red);">Ошибка загрузки данных</td></tr>';
       }
     } catch(e) {
-      $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--red);">Ошибка загрузки</td></tr>';
+      $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--red);">Ошибка сети</td></tr>';
     }
   }
 
@@ -201,7 +215,7 @@
   $("searchInput").addEventListener("input", renderTable);
   $("statusFilter").addEventListener("change", renderTable);
 
-  // Запуск
+  // Запуск при открытии
   loadReports();
 </script>
 </body>
