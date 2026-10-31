@@ -233,19 +233,16 @@
       tile.className = "app-tile";
       tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
       
-      tile.addEventListener("click", () => {
+            tile.addEventListener("click", () => {
         if (a.id === 'users') {
-          // Показываем экран приложения
+          // Прячем экран входа и рабочий стол
+          $("authScreen").classList.add("hidden"); 
           $("deskScreen").classList.add("hidden");
+          
+          // Показываем iframe
           $("appFrame").classList.remove("hidden");
           
-          // Настраиваем шапку приложения
-          const appHeader = $("appHeader");
-          if(appHeader) appHeader.classList.remove("hidden");
-          const appTitle = $("currentAppTitle");
-          if(appTitle) appTitle.textContent = a.label;
-          
-          // Загружаем iframe
+          // Загружаем страницу
           $("appIframe").src = "apps/users.html"; 
         } 
         else if (a.id === 'calc') {
@@ -366,10 +363,9 @@
     showAuth();
   });
 
-  // ВОТ ЭТО ДОБАВЛЯЕМ СЮДА:
-  $("backToDeskBtn").addEventListener("click", () => {
+   $("backToDeskBtn").addEventListener("click", () => {
     $("appFrame").classList.add("hidden");
-    $("deskScreen").classList.remove("hidden");
+    $("deskScreen").classList.remove("hidden"); // <--- Показываем рабочий стол
     $("appIframe").src = "about:blank"; // Очищаем iframe
   });
 
