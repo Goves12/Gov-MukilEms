@@ -271,12 +271,14 @@
         body: JSON.stringify({ action: "login", login: login, hash: hash })
       });
       
-      const data = await res.json();
+            const data = await res.json();
+      console.log("Ответ от сервера:", data); // <--- Это покажет ответ в консоли
 
       if (!data.success) {
         notify($("loginNotification"), data.message || "Неверный логин или пароль", "error");
         return;
-      }
+      } 
+      // ... дальше сохранение сессии и проверка isTemp
 
       // Сохраняем сессию
       saveSession({ login: data.login, role: data.role, ts: Date.now() });
@@ -350,12 +352,19 @@
     });
   }
 
-  // --- КНОПКИ ---
+    // --- КНОПКИ ---
   $("discordLoginBtn").addEventListener("click", (e) => e.preventDefault());
   
   $("logoutBtn").addEventListener("click", () => {
     clearSession();
     showAuth();
+  });
+
+  // ВОТ ЭТО ДОБАВЛЯЕМ СЮДА:
+  $("backToDeskBtn").addEventListener("click", () => {
+    $("appFrame").classList.add("hidden");
+    $("deskScreen").classList.remove("hidden");
+    $("appIframe").src = "about:blank"; // Очищаем iframe
   });
 
   // --- СТАРТ ---
