@@ -133,34 +133,14 @@
       <div class="app-grid" id="appGrid"></div>
     </div>
 
-        <!-- УНИВЕРСАЛЬНЫЙ ЭКРАН ДЛЯ ПРИЛОЖЕНИЙ -->
+            <!-- УНИВЕРСАЛЬНЫЙ ЭКРАН ДЛЯ ПРИЛОЖЕНИЙ -->
     <div class="app-screen hidden" id="appFrame">
       <div id="iframeContainer" style="width:100%; height: calc(100vh - 200px); background: #111823; border-radius: 16px; border: 1px solid var(--border); overflow: hidden;">
         <iframe id="appIframe" src="about:blank" style="width:100%; height:100%; border:none;"></iframe>
       </div>
     </div>
-      <div id="usersList" style="background:var(--panel-2); border:1px solid var(--border); border-radius:12px;"></div>
-      <div id="userFormBlock" class="hidden" style="margin-top:20px; background:var(--panel-2); padding:20px; border-radius:12px;">
-        <h3 id="userFormTitle" style="margin-bottom:15px;">Новый пользователь</h3>
-        <input type="hidden" id="editUserLogin">
-        <div class="form-group"><label>Логин</label><input type="text" id="newUserLogin"></div>
-        <div class="form-group"><label>Пароль</label><input type="text" id="newUserPassword" placeholder="12345"></div>
-        <div class="form-group"><label>Роль</label>
-          <select id="newUserRole">
-            <option value="Сотрудник">Сотрудник</option>
-            <option value="Старший состав">Старший состав</option>
-            <option value="Министр здравоохранения">Министр здравоохранения</option>
-            <option value="Бог">Бог</option>
-          </select>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:15px;">
-          <button class="btn-primary" id="saveUserBtn">Сохранить</button>
-          <button class="btn-primary" id="cancelUserBtn" style="background:var(--muted);">Отмена</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  </div> <!-- Закрывается .body -->
+</div> <!-- Закрывается .tablet -->
 
 <!-- МОДАЛКА СМЕНЫ ПАРОЛЯ -->
 <div class="modal-back hidden" id="forcePasswordModal">
@@ -268,7 +248,7 @@
         alert("Раздел в разработке");
       }
     });
-    // КОНЕЦ ЗАМЕНЫ
+   }// КОНЕЦ ЗАМЕНЫ
 
     grid.appendChild(tile);
   });
