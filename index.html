@@ -303,7 +303,7 @@
       }
 
       // Сохраняем сессию (добавили отдел)
-      saveSession({ login: data.login, role: data.role, department: data.department || "СМП", ts: Date.now() });
+      saveSession({ login: data.login, role: data.role, department: data.department || "МинЗдрав", ts: Date.now() });
 
       // Если пароль временный (isTemp = true), кидаем на смену
       if (data.isTemp) {
