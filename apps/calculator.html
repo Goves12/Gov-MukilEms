@@ -8,7 +8,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0b0f14; --panel-2: #1c2839; --text: #e8eef7; --muted: #8496ab;
-    --border: #26344a; --accent: #2f9e44; --blue: #3b82f6; --red: #ef4444;
+    --border: #26344a; --accent: #2f9e44; --blue: #3b82f6; --red: #ef4444; --amber: #f59e0b;
   }
   body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
   
@@ -23,7 +23,6 @@
   input { width: 100%; padding: 10px; font-size: 0.95rem; background: #0d1520; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
   input:focus { border-color: var(--accent); outline: none; }
 
-  /* Сетка для услуг */
   .services-grid { display: flex; flex-direction: column; gap: 10px; }
   .service-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 10px 15px; border-radius: 10px; border: 1px solid var(--border); }
   .service-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
@@ -65,7 +64,7 @@
   <div style="display:flex; gap:10px; flex-wrap:wrap;">
     <div class="form-group" style="flex:1; min-width:150px;">
       <label>Имя и Фамилия</label>
-      <input type="text" id="empName" placeholder="Иван Ивановичь">
+      <input type="text" id="empName" placeholder="Иван Иванович">
     </div>
     <div class="form-group" style="flex:1; min-width:150px;">
       <label>Номер паспорта</label>
@@ -92,7 +91,7 @@
 
 <div class="action-bar">
   <button class="btn btn-green" id="generateBtn">Сформировать текст</button>
-  <button class="btn btn-blue" id="sendToReportBtn" style="background:#f59e0b; display:none;">Отправить в Недельный отчет</button>
+  <button class="btn btn-blue" id="sendToReportBtn" style="background:var(--amber); display:none;">Отправить в Недельный отчет</button>
   <button class="btn btn-red" id="resetBtn">Сбросить</button>
 </div>
 
@@ -100,6 +99,7 @@
 
 <script>
   const $ = (id) => document.getElementById(id);
+  const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; // Твой адрес
 
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
@@ -141,6 +141,7 @@
     input.addEventListener('input', calculateTotal);
   });
 
+  // Генерация текста
   $("generateBtn").addEventListener("click", () => {
     const name = $("empName").value.trim() || "Не указано";
     const passport = $("empPassport").value.trim() || "Не указано";
@@ -170,30 +171,13 @@
 
     $("reportArea").value = text;
     $("reportArea").style.display = "block";
-    $("copyBtn").style.display = "flex";
+    
+    // Показываем кнопку отправки
+    $("sendToReportBtn").style.display = "flex";
     
     navigator.clipboard.writeText(text).then(() => {
       alert("✅ Отчет сформирован и скопирован!");
     });
-  });
-
-  $("copyBtn").addEventListener("click", () => {
-    navigator.clipboard.writeText($("reportArea").value);
-    alert("✅ Скопировано!");
-  });
-
-  $("resetBtn").addEventListener("click", () => {
-    $("empName").value = ""; $("empPassport").value = ""; $("empRole").value = "";
-    document.querySelectorAll('.service-input').forEach(inp => inp.value = "0");
-    calculateTotal();
-    $("reportArea").style.display = "none";
-    $("copyBtn").style.display = "none";
-  });
-    // Показываем кнопку отправки после формирования текста
-  const originalGenerate = $("generateBtn").addEventListener("click", () => {
-    // ... (твой старый код генерации) ...
-    // Просто в самом конце старого кода добавь:
-    $("sendToReportBtn").style.display = "flex";
   });
 
   // Отправка на сервер
@@ -236,6 +220,15 @@
       btn.textContent = "Отправить в Недельный отчет";
       btn.disabled = false;
     }
+  });
+
+  // Сброс
+  $("resetBtn").addEventListener("click", () => {
+    $("empName").value = ""; $("empPassport").value = ""; $("empRole").value = "";
+    document.querySelectorAll('.service-input').forEach(inp => inp.value = "0");
+    calculateTotal();
+    $("reportArea").style.display = "none";
+    $("sendToReportBtn").style.display = "none";
   });
 </script>
 </body>
