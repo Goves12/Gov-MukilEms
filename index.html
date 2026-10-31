@@ -241,18 +241,24 @@
       tile.className = "app-tile";
       tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
       
-                  tile.addEventListener("click", () => {
+            tile.addEventListener("click", () => {
         if (a.id === 'users') {
           $("authScreen").classList.add("hidden"); 
           $("deskScreen").classList.add("hidden");
-          
-          // Показываем экран приложения и ШАПКУ с кнопкой
           $("appFrame").classList.remove("hidden");
-          $("appHeader").classList.remove("hidden"); // <-- ВОТ ЭТО ПОКАЗЫВАЕТ ШАПКУ
-          $("currentAppTitle").textContent = a.label; // Меняем заголовок
-          
+          $("appHeader").classList.remove("hidden"); 
+          $("currentAppTitle").textContent = a.label; 
           $("appIframe").src = "apps/users.html"; 
         } 
+        else if (a.id === 'about') {
+          $("authScreen").classList.add("hidden"); 
+          $("deskScreen").classList.add("hidden");
+          $("appFrame").classList.remove("hidden");
+          $("appHeader").classList.remove("hidden"); 
+          $("currentAppTitle").textContent = a.label; 
+          // Передаем логин и роль в URL для iframe
+          $("appIframe").src = `apps/about.html?user=${session.login}&role=${session.role}`; 
+        }
         else if (a.id === 'calc') {
           window.open("calculator.html", "_blank");
         } 

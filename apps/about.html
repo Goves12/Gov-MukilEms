@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>О системе</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0b0f14; --panel-2: #1c2839; --text: #e8eef7; --muted: #8496ab;
+    --border: #26344a; --border-strong: #3a4a66; --accent: #2f9e44;
+    --blue: #3b82f6; --red: #ef4444; --amber: #f59e0b;
+  }
+  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
+  
+  .card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .card h3 { font-size: 1rem; margin-bottom: 15px; }
+  
+  .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .row:last-child { border-bottom: none; }
+  .row span:first-child { color: var(--muted); }
+  .row span:last-child { font-weight: 600; }
+  
+  .theme-switcher { display: flex; gap: 8px; margin-top: 10px; }
+  .theme-btn { flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); cursor: pointer; font-weight: 600; }
+  .theme-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-switch { width: 44px; height: 24px; border-radius: 999px; background: var(--border); cursor: pointer; position: relative; transition: 0.2s; }
+  .toggle-switch.on { background: var(--accent); }
+  .toggle-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: 0.2s; }
+  .toggle-switch.on::after { transform: translateX(20px); }
+
+  .devlog-item { background: var(--bg); border-left: 3px solid var(--blue); padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+  .devlog-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+  .devlog-text { font-size: 0.9rem; line-height: 1.4; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<!-- Оформление -->
+<div class="card">
+  <h3>Оформление</h3>
+  <div class="theme-switcher">
+    <button class="theme-btn" data-theme="light">Светлая</button>
+    <button class="theme-btn" data-theme="dark">Тёмная</button>
+  </div>
+</div>
+
+<!-- Состояние -->
+<div class="card">
+  <h3>Состояние соединения</h3>
+  <div class="row"><span>Версия планшета</span><span>2.5</span></div>
+  <div class="row"><span>Сервер (Worker)</span><span id="aboutServer" style="color:var(--amber)">Проверка…</span></div>
+  <div class="row"><span>Пользователь</span><span id="aboutUser">—</span></div>
+  <div class="row"><span>Роль</span><span id="aboutRole">—</span></div>
+</div>
+
+<!-- Уведомления -->
+<div class="card">
+  <h3>Уведомления</h3>
+  <div class="toggle-row">
+    <div>
+      <div style="font-weight:600;">Всплывающие уведомления</div>
+      <div style="font-size:0.75rem; color:var(--muted);">Показывать подсказки вверху экрана</div>
+    </div>
+    <div class="toggle-switch on" id="toggleToasts"></div>
+  </div>
+  <div class="toggle-row">
+    <div>
+      <div style="font-weight:600;">Звук</div>
+      <div style="font-size:0.75rem; color:var(--muted);">Проигрывать звук при новых записях</div>
+    </div>
+    <div class="toggle-switch on" id="toggleSound"></div>
+  </div>
+</div>
+
+<!-- Devlog -->
+<div class="card">
+  <h3>📝 Devlog — журнал изменений</h3>
+  <div id="devlogList">
+    <div style="color:var(--muted); text-align:center; padding:10px;">Загрузка...</div>
+  </div>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  // Кнопка Назад
+  $("backBtn")?.addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
+
+  // Получаем данные пользователя из iframe
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('user') || 'Гость';
+  const userRole = urlParams.get('role') || '—';
+  
+  $("aboutUser").textContent = userName;
+  $("aboutRole").textContent = userRole;
+
+  // Проверка сервера
+  fetch("https://goverment.vadrgnuil.workers.dev", { method: "POST", body: JSON.stringify({action: "ping"}) })
+    .then(res => {
+      if(res.ok) {
+        $("aboutServer").textContent = "Доступен ✓";
+        $("aboutServer").style.color = "var(--accent)";
+      }
+    }).catch(() => {
+      $("aboutServer").textContent = "Недоступен ✗";
+      $("aboutServer").style.color = "var(--red)";
+    });
+
+  // Переключатель темы
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Отправляем сообщение родителю, чтобы он сменил тему (если мы это поддержим)
+      window.parent.postMessage({ action: "setTheme", theme: btn.dataset.theme }, "*");
+    });
+  });
+
+  // Тумблеры
+  $("toggleToasts").addEventListener("click", function() { this.classList.toggle("on"); });
+  $("toggleSound").addEventListener("click", function() { this.classList.toggle("on"); });
+
+  // Заглушка для Devlog (в будущем можно подтягивать из базы)
+  setTimeout(() => {
+    $("devlogList").innerHTML = `
+      <div class="devlog-item">
+        <div class="devlog-meta"><span>Сегодня</span><span>Администратор</span></div>
+        <div class="devlog-text">Добавлено приложение "О системе". Внедрены настройки интерфейса.</div>
+      </div>
+    `;
+  }, 500);
+</script>
