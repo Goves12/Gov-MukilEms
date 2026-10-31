@@ -10,12 +10,8 @@
 
   :root {
     --bg: #0b0f14;
-    --bg-2: #111823;
-    --panel: #16202e;
     --panel-2: #1c2839;
-    --panel-3: #223147;
     --text: #e8eef7;
-    --text-soft: #c7d3e3;
     --muted: #8496ab;
     --border: #26344a;
     --border-strong: #3a4a66;
@@ -25,10 +21,7 @@
     --red: #ef4444;
     --amber: #f59e0b;
     --purple: #8b5cf6;
-    --cyan: #06b6d4;
-    --gray: #64748b;
     --discord: #5865F2;
-    --discord-hover: #4752c4;
     --success-bg: #14532d;
     --success-text: #bbf7d0;
     --error-bg: #4c1d1d;
@@ -77,16 +70,11 @@
 
   .title { flex: 1; min-width: 0; }
   .title h1 { font-size: 1.05rem; font-weight: 700; }
-  .title .sub {
-    font-size: 0.72rem; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-  }
+  .title .sub { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
 
   .user-chip {
-    display: none;
-    align-items: center; gap: 8px;
-    padding: 6px 10px 6px 6px;
-    background: var(--panel-2); border: 1px solid var(--border);
+    display: none; align-items: center; gap: 8px;
+    padding: 6px 10px 6px 6px; background: var(--panel-2); border: 1px solid var(--border);
     border-radius: 999px; font-size: 0.8rem;
   }
   .user-chip.visible { display: flex; }
@@ -94,16 +82,11 @@
     width: 26px; height: 26px; border-radius: 50%;
     background: linear-gradient(135deg, var(--blue), #1d4ed8);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.78rem; color: #fff;
-    text-transform: uppercase; overflow: hidden;
+    font-weight: 700; font-size: 0.78rem; color: #fff; text-transform: uppercase; overflow: hidden;
   }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
   .logout-btn {
-    padding: 5px 10px; font-size: 0.72rem;
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text);
-    cursor: pointer; font-family: inherit;
-    transition: background .15s;
+    padding: 5px 10px; font-size: 0.72rem; background: transparent; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); cursor: pointer; font-family: inherit; transition: background .15s;
   }
   .logout-btn:hover { background: var(--panel); }
 
@@ -112,127 +95,63 @@
 
   /* ============ ЭКРАН ВХОДА ============ */
   .auth-screen {
-    min-height: calc(100vh - 80px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
+    min-height: calc(100vh - 80px); display: flex; align-items: center; justify-content: center; padding: 20px;
   }
   .auth-card {
-    width: 100%; max-width: 440px;
-    background: linear-gradient(180deg, #16202e 0%, #1c2839 100%);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 26px;
-    box-shadow: 0 10px 40px rgba(0,0,0,.5);
-    position: relative; overflow: hidden;
+    width: 100%; max-width: 440px; background: linear-gradient(180deg, #16202e 0%, #1c2839 100%);
+    border: 1px solid var(--border); border-radius: 20px; padding: 32px 26px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5); position: relative; overflow: hidden;
   }
   .auth-card::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, #dc2626, #2f9e44, #3b82f6);
   }
   .auth-emblem {
-    width: 64px; height: 64px; margin: 0 auto 16px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
-    position: relative;
+    width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 18px;
+    background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%); position: relative;
     box-shadow: 0 0 0 3px rgba(220,38,38,.2), 0 8px 24px rgba(220,38,38,.35);
   }
-  .auth-emblem::before, .auth-emblem::after {
-    content: ""; position: absolute; background: #fff; border-radius: 3px;
-  }
+  .auth-emblem::before, .auth-emblem::after { content: ""; position: absolute; background: #fff; border-radius: 3px; }
   .auth-emblem::before { width: 34px; height: 9px; top: 27px; left: 15px; }
   .auth-emblem::after  { width: 9px; height: 34px; top: 15px; left: 27px; }
 
-  .auth-card h1 {
-    font-size: 1.3rem; margin-bottom: 4px; text-align: center;
-  }
-  .auth-card .subtitle {
-    color: var(--muted); font-size: 0.84rem;
-    margin-bottom: 24px; text-align: center;
-  }
+  .auth-card h1 { font-size: 1.3rem; margin-bottom: 4px; text-align: center; }
+  .auth-card .subtitle { color: var(--muted); font-size: 0.84rem; margin-bottom: 24px; text-align: center; }
 
   /* Плашка с двумя вариантами */
-  .login-options {
-    display: flex; flex-direction: column; gap: 14px;
-  }
+  .login-options { display: flex; flex-direction: column; gap: 14px; }
 
-  /* Discord-кнопка */
   .btn-discord {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 10px; width: 100%;
-    padding: 14px;
-    background: var(--discord);
-    color: #fff; text-decoration: none;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    font-size: 15px; font-weight: 700;
-    font-family: inherit; cursor: pointer;
-    transition: background .2s, transform .1s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+    padding: 14px; background: var(--discord); color: #fff; text-decoration: none;
+    border: 1px solid rgba(255,255,255,.12); border-radius: 12px; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: background .2s, transform .1s;
   }
-  .btn-discord:hover { background: var(--discord-hover); transform: translateY(-1px); }
-  .btn-discord:active { transform: scale(.98); }
-  .btn-discord svg { width: 22px; height: 22px; fill: #fff; flex-shrink: 0; }
+  .btn-discord:hover { background: #4752c4; transform: translateY(-1px); }
 
-  /* Разделитель */
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    color: var(--muted); font-size: 0.72rem;
-    text-transform: uppercase; letter-spacing: 0.08em;
-  }
-  .divider::before, .divider::after {
-    content: ""; flex: 1; height: 1px; background: var(--border);
-  }
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
-  /* Форма логин/пароль */
   .form-group { margin-bottom: 12px; }
-  label {
-    display: block; font-size: 0.72rem; font-weight: 600;
-    margin-bottom: 6px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
-  }
+  label { display: block; font-size: 0.72rem; font-weight: 600; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; }
   input[type="text"], input[type="password"] {
-    width: 100%; padding: 12px 14px;
-    font-size: 0.95rem; font-family: inherit;
-    color: var(--text); background: #0d1520;
-    border: 1px solid var(--border);
-    border-radius: 10px; outline: none;
-    transition: border-color .15s, box-shadow .15s;
-    -webkit-appearance: none; appearance: none;
+    width: 100%; padding: 12px 14px; font-size: 0.95rem; font-family: inherit;
+    color: var(--text); background: #0d1520; border: 1px solid var(--border); border-radius: 10px; outline: none;
   }
-  input:focus {
-    border-color: var(--accent-2);
-    box-shadow: 0 0 0 3px rgba(47,158,68,.22);
-  }
-  input:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
+  input:focus { border-color: var(--accent-2); box-shadow: 0 0 0 3px rgba(47,158,68,.22); }
 
   .btn-primary {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 100%; padding: 13px;
-    background: var(--accent);
-    color: #fff; border: none;
-    border-radius: 12px;
-    font-size: 15px; font-weight: 700;
-    font-family: inherit; cursor: pointer;
-    transition: background .15s, transform .05s, opacity .15s;
+    display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 13px;
+    background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: background .15s;
   }
   .btn-primary:hover:not(:disabled) { background: var(--accent-2); }
-  .btn-primary:active:not(:disabled) { transform: scale(.98); }
-  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
 
-  /* Уведомление */
-  .notification {
-    margin-top: 12px; padding: 11px 14px;
-    border-radius: 10px; font-size: 0.84rem; font-weight: 500;
-    display: none;
-  }
-  .notification.show { display: block; animation: fadeIn .25s ease; }
-  .notification.success { background: var(--success-bg); color: var(--success-text); }
+  .notification { margin-top: 12px; padding: 11px 14px; border-radius: 10px; font-size: 0.84rem; font-weight: 500; display: none; }
+  .notification.show { display: block; }
   .notification.error { background: var(--error-bg); color: var(--error-text); }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(-4px) } to { opacity:1; transform: translateY(0) } }
 
-  .auth-foot {
-    margin-top: 20px; font-size: 0.72rem;
-    color: var(--muted); text-align: center;
-  }
+  .auth-foot { margin-top: 20px; font-size: 0.72rem; color: var(--muted); text-align: center; }
 
   /* ============ ПЛАНШЕТ ============ */
   .desk-screen { padding: 6px 4px; }
@@ -240,89 +159,49 @@
   .greeting h2 { font-size: 1.25rem; font-weight: 700; }
   .greeting p { color: var(--muted); font-size: 0.86rem; margin-top: 2px; }
 
-  .app-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
-  }
+  .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
   .app-tile {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 12px; padding: 22px 14px;
-    background: linear-gradient(180deg, #16202e 0%, #1c2839 100%);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    cursor: pointer; text-align: center;
-    user-select: none;
-    transition: transform .12s, border-color .15s, box-shadow .15s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 22px 14px;
+    background: linear-gradient(180deg, #16202e 0%, #1c2839 100%); border: 1px solid var(--border);
+    border-radius: 18px; cursor: pointer; text-align: center; transition: transform .12s;
   }
-  .app-tile:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-    box-shadow: 0 6px 20px rgba(0,0,0,.3);
-  }
-  .app-tile:active { transform: scale(.98); }
-
+  .app-tile:hover { transform: translateY(-2px); border-color: var(--border-strong); }
   .app-icon {
-    width: 56px; height: 56px; border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    box-shadow: 0 6px 16px rgba(0,0,0,.35);
+    width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #fff;
   }
   .app-icon svg { width: 30px; height: 30px; }
-  .app-icon.green  { background: linear-gradient(135deg, #2f9e44, #1b6b2e); }
   .app-icon.blue   { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-  .app-icon.red    { background: linear-gradient(135deg, #ef4444, #991b1b); }
   .app-icon.amber  { background: linear-gradient(135deg, #f59e0b, #b45309); }
-  .app-icon.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-  .app-icon.cyan   { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+  .app-icon.red    { background: linear-gradient(135deg, #ef4444, #991b1b); }
   .app-icon.gray   { background: linear-gradient(135deg, #64748b, #334155); }
-
-  .app-tile .label { font-size: .88rem; font-weight: 600; line-height: 1.25; }
-  .app-tile .sub { font-size: .72rem; color: var(--muted); margin-top: -6px; }
+  .app-tile .label { font-size: .88rem; font-weight: 600; }
+  .app-tile .sub { font-size: .72rem; color: var(--muted); }
 
   .hidden { display: none !important; }
 
-  /* ============ ТОСТ ============ */
-  .toast-container {
-    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-    z-index: 9999; display: flex; flex-direction: column; gap: 8px;
-    width: calc(100% - 32px); max-width: 420px; pointer-events: none;
+  /* ============ МОДАЛКА СМЕНЫ ПАРОЛЯ ============ */
+  .modal-back {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 10000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
   }
-  .toast {
-    padding: 12px 16px;
-    background: linear-gradient(180deg, #1f2a3d 0%, #16202e 100%);
-    border: 1px solid #2f3d55;
-    border-left: 4px solid var(--accent);
-    border-radius: 14px;
-    color: var(--text); font-size: .86rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,.55);
-    pointer-events: auto;
-    animation: toastIn .3s ease;
+  .modal {
+    width: 100%; max-width: 420px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 26px 22px; box-shadow: 0 20px 60px rgba(0,0,0,.8); position: relative;
   }
-  .toast.error { border-left-color: var(--red); }
-  .toast.info  { border-left-color: var(--blue); }
-  @keyframes toastIn {
-    from { transform: translateY(-120%); opacity: 0 }
-    to   { transform: translateY(0); opacity: 1 }
+  .modal-emblem {
+    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 16px;
+    background: linear-gradient(135deg, #f59e0b, #b45309); display: flex; align-items: center; justify-content: center;
   }
+  .modal-emblem svg { width: 28px; height: 28px; color: #fff; }
+  .modal h2 { text-align: center; font-size: 1.15rem; margin-bottom: 6px; }
+  .modal .modal-sub { text-align: center; color: var(--muted); font-size: 0.84rem; margin-bottom: 20px; }
 
   @media (max-width: 600px) {
-    .body { padding: 14px; }
     .app-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .app-tile { padding: 16px 8px; }
-    .app-icon { width: 46px; height: 46px; }
-    .app-icon svg { width: 24px; height: 24px; }
-    .auth-card { padding: 26px 20px; }
-    .auth-emblem { width: 56px; height: 56px; }
-    .auth-emblem::before { width: 30px; height: 8px; top: 24px; left: 13px; }
-    .auth-emblem::after  { width: 8px; height: 30px; top: 13px; left: 24px; }
   }
 </style>
 </head>
 <body>
-
-<div class="toast-container" id="toastContainer"></div>
 
 <div class="tablet">
   <div class="header">
@@ -385,6 +264,34 @@
   </div>
 </div>
 
+<!-- ============ МОДАЛКА СМЕНЫ ПАРОЛЯ ============ -->
+<div class="modal-back hidden" id="forcePasswordModal">
+  <div class="modal">
+    <div class="modal-emblem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <h2>Смените пароль</h2>
+    <p class="modal-sub">Вы вошли с временным паролем. Пока вы его не смените, доступ к планшету закрыт.</p>
+
+    <form id="forcePasswordForm">
+      <div class="form-group">
+        <label for="fpNew1">Новый пароль</label>
+        <input type="password" id="fpNew1" required autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="fpNew2">Повторите новый пароль</label>
+        <input type="password" id="fpNew2" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn-primary" id="fpSubmit">Сменить пароль и продолжить</button>
+      <div class="notification" id="fpNotification"></div>
+    </form>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -395,6 +302,10 @@
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev";
   const REDIRECT_AFTER_LOGIN = window.location.origin + window.location.pathname;
   const SESSION_KEY = "hospital_session_v2";
+  const PASSWORDS_KEY = "hospital_passwords_db";
+
+  // Хэш от "12345" (начальный пароль)
+  const TEMP_PASSWORD_HASH = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5";
 
   const $ = (id) => document.getElementById(id);
 
@@ -413,49 +324,39 @@
   const greetingTitle = $("greetingTitle");
   const greetingSub = $("greetingSub");
   const appGrid = $("appGrid");
-  const toastContainer = $("toastContainer");
+
+  const forcePasswordModal = $("forcePasswordModal");
+  const forcePasswordForm = $("forcePasswordForm");
+  const fpNew1 = $("fpNew1");
+  const fpNew2 = $("fpNew2");
+  const fpSubmit = $("fpSubmit");
+  const fpNotification = $("fpNotification");
 
   // ============================================================
-  //  ПРИЛОЖЕНИЯ (плитки на рабочем столе)
+  //  ПРИЛОЖЕНИЯ
   // ============================================================
   const APPS = [
     {
-      label: "Персонал",
-      sub: "Список сотрудников",
-      color: "blue",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+      label: "Персонал", sub: "Список сотрудников", color: "blue",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
     },
     {
-      label: "Отпуска",
-      sub: "IC · OOC",
-      color: "amber",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 15l2 2 4-4"/></svg>'
+      label: "Отпуска", sub: "IC · OOC", color: "amber",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 15l2 2 4-4"/></svg>'
     },
     {
-      label: "Калькулятор",
-      sub: "Баллы · отчёт",
-      color: "red",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>'
+      label: "Калькулятор", sub: "Баллы · отчёт", color: "red",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>'
     },
     {
-      label: "О системе",
-      sub: "Настройки",
-      color: "gray",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+      label: "О системе", sub: "Настройки", color: "gray",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
     }
   ];
 
   // ============================================================
   //  УТИЛИТЫ
   // ============================================================
-  function showToast(text, kind) {
-    const el = document.createElement("div");
-    el.className = "toast" + (kind ? " " + kind : "");
-    el.textContent = text;
-    toastContainer.appendChild(el);
-    setTimeout(() => el.remove(), 4000);
-  }
-
   function notify(el, message, type) {
     el.textContent = message;
     el.className = "notification show " + type;
@@ -463,48 +364,42 @@
     el._timer = setTimeout(() => el.classList.remove("show"), 4500);
   }
 
-  // SHA-256 (как в твоём текущем коде — с fallback)
+  // SHA-256 (встроенный в браузер)
   async function sha256Hex(text) {
     if (window.crypto && window.crypto.subtle) {
-      try {
-        const enc = new TextEncoder();
-        const buf = await crypto.subtle.digest("SHA-256", enc.encode(text));
-        return Array.from(new Uint8Array(buf))
-          .map(b => b.toString(16).padStart(2, "0")).join("");
-      } catch (e) { /* fallback ниже */ }
+      const enc = new TextEncoder();
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(text));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
-    // Fallback — упрощённый (если нет crypto.subtle, лучше не логиниться)
-    throw new Error("SHA-256 недоступен в этом браузере");
+    throw new Error("SHA-256 недоступен");
   }
 
-  async function apiPost(payload) {
-    const res = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
+  // ============================================================
+  //  ЛОКАЛЬНАЯ БАЗА ПАРОЛЕЙ (localStorage)
+  // ============================================================
+  function getPasswordHash(login) {
+    try {
+      const db = JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}");
+      return db[login.toLowerCase()] || null;
+    } catch (e) { return null; }
+  }
+
+  function setPasswordHash(login, hash) {
+    try {
+      const db = JSON.parse(localStorage.getItem(PASSWORDS_KEY) || "{}");
+      db[login.toLowerCase()] = hash;
+      localStorage.setItem(PASSWORDS_KEY, JSON.stringify(db));
+    } catch (e) {}
   }
 
   // ============================================================
   //  СЕССИЯ
   // ============================================================
-  function saveSession(data) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
-  }
+  function saveSession(data) { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); }
   function loadSession() {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return null;
-      const d = JSON.parse(raw);
-      if (d && d.login) return d;
-    } catch (e) {}
-    return null;
+    try { const raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
-  function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
-  }
+  function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
   // ============================================================
   //  РЕНДЕР
@@ -514,13 +409,8 @@
     APPS.forEach((a) => {
       const tile = document.createElement("div");
       tile.className = "app-tile";
-      tile.innerHTML =
-        '<div class="app-icon ' + a.color + '">' + a.icon + '</div>' +
-        '<div class="label">' + a.label + '</div>' +
-        '<div class="sub">' + a.sub + '</div>';
-      tile.addEventListener("click", () => {
-        showToast("Приложение «" + a.label + "» скоро появится", "info");
-      });
+      tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
+      tile.addEventListener("click", () => alert("Приложение " + a.label + " в разработке"));
       appGrid.appendChild(tile);
     });
   }
@@ -536,51 +426,12 @@
   function showDesk(session) {
     authScreen.classList.add("hidden");
     deskScreen.classList.remove("hidden");
-
     userChip.classList.add("visible");
     userName.textContent = session.login;
-
-    if (session.avatar) {
-      userAvatar.innerHTML = '<img src="' + session.avatar + '" alt="">';
-    } else {
-      userAvatar.textContent = (session.login || "?").charAt(0).toUpperCase();
-    }
-
+    userAvatar.textContent = (session.login || "?").charAt(0).toUpperCase();
     greetingTitle.textContent = "Добро пожаловать, " + session.login;
-    greetingSub.textContent = session.role
-      ? "Роль: " + session.role + (session.department ? " · " + session.department : "")
-      : "Выберите приложение";
-
+    greetingSub.textContent = "Выберите приложение";
     renderApps();
-  }
-
-  // ============================================================
-  //  ВОЗВРАТ ПОСЛЕ DISCORD OAUTH
-  // ============================================================
-  function handleOAuthReturn() {
-    const params = new URLSearchParams(window.location.search);
-    const login = params.get("login");
-    const role = params.get("role") || "user";
-    const avatar = params.get("avatar") || "";
-    const department = params.get("dept") || "";
-    const error = params.get("error");
-
-    if (error) {
-      showToast("Ошибка входа: " + error, "error");
-      window.history.replaceState({}, "", window.location.pathname);
-      return false;
-    }
-
-    if (login) {
-      const session = { login, role, avatar, department, ts: Date.now() };
-      saveSession(session);
-      window.history.replaceState({}, "", window.location.pathname);
-      showDesk(session);
-      showToast("Добро пожаловать, " + login, "success");
-      return true;
-    }
-
-    return false;
   }
 
   // ============================================================
@@ -593,36 +444,97 @@
     if (!login || !password) return;
 
     loginSubmit.disabled = true;
-    const original = loginSubmit.textContent;
     loginSubmit.textContent = "Проверка…";
 
     try {
       const hash = await sha256Hex(password);
-      const data = await apiPost({ action: "login", login, hash });
+      let isSuccess = false;
+      let mustChange = false;
 
-      if (!data.success) {
-        notify(loginNotification, data.message || "Неверный логин или пароль", "error");
+      if (login.toLowerCase() === "todd") {
+        // Проверяем, менял ли он уже пароль
+        const savedHash = getPasswordHash("todd");
+        
+        if (savedHash) {
+          // Если менял — проверяем совпадение
+          if (hash === savedHash) isSuccess = true;
+        } else {
+          // Если не менял — пускаем только с 12345
+          if (hash === TEMP_PASSWORD_HASH) {
+            isSuccess = true;
+            mustChange = true; // Требуем смену
+          }
+        }
+      } else {
+        notify(loginNotification, "Неизвестный пользователь. Попробуйте Todd.", "error");
         return;
       }
 
-      const session = {
-        login: data.login,
-        role: data.role,
-        department: data.department || "",
-        discord: data.discord || "",
-        avatar: "",
-        hash: hash,
-        ts: Date.now()
-      };
+      if (!isSuccess) {
+        notify(loginNotification, "Неверный логин или пароль", "error");
+        return;
+      }
+
+      // Сохраняем сессию
+      const session = { login: login, role: "user", ts: Date.now() };
       saveSession(session);
-      showDesk(session);
-      showToast("Добро пожаловать, " + session.login, "success");
+
+      if (mustChange) {
+        // Показываем модалку смены пароля
+        authScreen.classList.add("hidden");
+        forcePasswordModal.classList.remove("hidden");
+        setTimeout(() => fpNew1.focus(), 100);
+      } else {
+        // Пускаем на рабочий стол
+        showDesk(session);
+      }
+
     } catch (err) {
       console.error(err);
-      notify(loginNotification, "Ошибка сети. Попробуйте позже.", "error");
+      notify(loginNotification, "Ошибка: " + err.message, "error");
     } finally {
       loginSubmit.disabled = false;
-      loginSubmit.textContent = original;
+      loginSubmit.textContent = "Войти по логину";
+    }
+  });
+
+  // ============================================================
+  //  ПРИНУДИТЕЛЬНАЯ СМЕНА ПАРОЛЯ
+  // ============================================================
+  forcePasswordForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const p1 = fpNew1.value;
+    const p2 = fpNew2.value;
+
+    if (!p1 || !p2) { notify(fpNotification, "Заполните все поля", "error"); return; }
+    if (p1.length < 4) { notify(fpNotification, "Пароль слишком короткий (мин. 4)", "error"); return; }
+    if (p1 !== p2) { notify(fpNotification, "Пароли не совпадают", "error"); return; }
+    if (p1 === "12345") { notify(fpNotification, "Нельзя использовать 12345", "error"); return; }
+
+    fpSubmit.disabled = true;
+    fpSubmit.textContent = "Сохранение…";
+
+    try {
+      const newHash = await sha256Hex(p1);
+      setPasswordHash("todd", newHash); // Сохраняем новый пароль локально
+
+      notify(fpNotification, "Пароль успешно изменён!", "success");
+
+      setTimeout(() => {
+        forcePasswordModal.classList.add("hidden");
+        fpNew1.value = "";
+        fpNew2.value = "";
+        fpNotification.classList.remove("show");
+        
+        const session = loadSession();
+        if (session) showDesk(session);
+      }, 1000);
+
+    } catch (err) {
+      notify(fpNotification, "Ошибка сохранения", "error");
+    } finally {
+      fpSubmit.disabled = false;
+      fpSubmit.textContent = "Сменить пароль и продолжить";
     }
   });
 
@@ -630,29 +542,25 @@
   //  СТАРТ
   // ============================================================
   function init() {
-    // Discord-кнопка ведёт на Worker
-    discordLoginBtn.href = WORKER_URL + "/auth/discord?redirect=" +
-      encodeURIComponent(REDIRECT_AFTER_LOGIN);
+    // Кнопка Discord (заглушка для этого теста)
+    discordLoginBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("Вход через Discord будет добавлен позже. Используйте логин Todd и пароль 12345.");
+    });
 
     // Выход
     logoutBtn.addEventListener("click", () => {
       clearSession();
       showAuth();
-      showToast("Вы вышли из системы", "info");
     });
 
-    // 1) Пришли после Discord?
-    if (handleOAuthReturn()) return;
-
-    // 2) Есть сессия?
+    // Если есть активная сессия — сразу в планшет
     const session = loadSession();
     if (session) {
       showDesk(session);
-      return;
+    } else {
+      showAuth();
     }
-
-    // 3) Иначе — экран входа
-    showAuth();
   }
 
   document.addEventListener("DOMContentLoaded", init);
