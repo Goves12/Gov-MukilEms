@@ -377,9 +377,15 @@
     // --- КНОПКИ ---
   $("discordLoginBtn").addEventListener("click", (e) => e.preventDefault());
   
-  $("logoutBtn").addEventListener("click", () => {
+    $("logoutBtn").addEventListener("click", () => {
     clearSession();
-    showAuth();
+    
+    // Принудительно скрываем и очищаем приложения
+    $("appFrame").classList.add("hidden");
+    $("appHeader").classList.add("hidden");
+    $("appIframe").src = "about:blank"; 
+    
+    showAuth(); // Показываем экран входа
   });
 
    $("backToDeskBtn").addEventListener("click", () => {
