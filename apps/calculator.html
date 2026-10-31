@@ -30,12 +30,30 @@
   input { width: 100%; padding: 10px; font-size: 0.95rem; background: #0d1520; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
   input:focus { border-color: var(--accent); outline: none; }
 
-  /* Услуги */
-  .service-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    /* Услуги */
+  .service-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
   .service-row:last-child { border-bottom: none; }
-  .service-name { font-size: 0.9rem; flex: 1; padding-right: 10px; }
-  .service-price { font-weight: 600; color: var(--accent); min-width: 80px; text-align: right; margin-right: 15px; }
-  .service-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
+  .service-name { font-size: 0.9rem; flex: 1; }
+  .service-price { font-weight: 600; color: var(--accent); min-width: 80px; text-align: right; }
+  
+  /* Новое поле для количества */
+  .service-input {
+    width: 60px;
+    padding: 8px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    background: #0d1520;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+  }
+  .service-input:focus { border-color: var(--accent); outline: none; }
+  
+  /* Убираем стрелочки у number в Webkit браузерах */
+  .service-input::-webkit-outer-spin-button,
+  .service-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .service-input[type=number] { -moz-appearance: textfield; }
 
   /* Итог */
   .total-box { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 2px dashed var(--border); }
