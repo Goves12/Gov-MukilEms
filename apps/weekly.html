@@ -5,135 +5,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Недельный отчет (Премии)</title>
 <style>
+  /* ============ БАЗА И ЦВЕТА (взято из твоего файла) ============ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0b0f14; --panel: #16202e; --panel-2: #1c2839; --text: #e8eef7; --muted: #8496ab;
-    --border: #26344a; --accent: #2f9e44; --blue: #3b82f6; --red: #ef4444; --amber: #f59e0b;
+    --bg: #0b0f14; --bg-2: #111823; --panel: #16202e; --panel-2: #1c2839; --panel-3: #223147;
+    --text: #e8eef7; --muted: #8496ab; --border: #26344a; --border-strong: #3a4d6b;
+    --accent: #2f9e44; --accent-2: #37b24d; --accent-bg: rgba(47,158,68,0.12); --accent-border: rgba(47,158,68,0.5);
+    --blue: #3b82f6; --blue-bg: rgba(59,130,246,0.14); --blue-border: rgba(59,130,246,0.5);
+    --amber: #f59e0b; --amber-bg: rgba(245,158,11,0.12); --amber-border: rgba(245,158,11,0.5);
+    --red: #ef4444; --red-bg: rgba(239,68,68,0.12); --red-border: rgba(239,68,68,0.5);
+    --input-bg: #0c1420; --table-hover: rgba(47,158,68,0.04);
+    --card-bg: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    --shadow-card: 0 6px 20px rgba(0,0,0,0.3);
   }
-  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
-
-  /* Кнопка назад */
-  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
-  .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #1c2839; border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
-
-  /* Верхние вкладки */
-  .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-  .tab { 
-    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; 
-    padding: 10px 16px; font-weight: 600; color: var(--text); cursor: pointer;
-    display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%);
+    color: var(--text); min-height: 100vh; padding: 16px;
   }
-  .tab.active { border-color: var(--accent); color: #bbf7d0; }
-  .tab .count { background: var(--accent); color: #fff; border-radius: 999px; padding: 2px 8px; font-size: 0.75rem; }
-
-  /* Основная панель */
-  .main-panel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
   
-  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .panel-title { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; font-weight: bold; }
-  .panel-title svg { color: var(--accent); }
-  .btn-refresh { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  /* Шапка */
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
 
-  /* Фильтры */
-  .filters-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-  .search-box { flex: 1; min-width: 200px; position: relative; }
-  .search-box input { width: 100%; padding: 10px 10px 10px 35px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); }
-  .search-box svg { position: absolute; left: 10px; top: 11px; width: 16px; height: 16px; color: var(--muted); }
-  .filter-select { padding: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; }
-  .total-count { color: var(--muted); font-size: 0.85rem; margin-left: auto; }
+  /* Вкладки */
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tab-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px;
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 0.86rem; font-weight: 600; cursor: pointer;
+  }
+  .tab-btn.active { background: var(--accent-bg); border-color: var(--accent-border); color: #86efac; }
+  .tab-btn .count { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; }
 
-  /* Таблица */
-  .table-container { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; text-align: left; }
-  th { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); padding: 12px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
-  td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 0.9rem; vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
+  /* Карточки и таблица */
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow-card); }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .card-head h2 { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+  .toolbar { display: grid; grid-template-columns: 1fr 200px 150px; gap: 8px; margin-bottom: 12px; }
+  @media (max-width: 720px) { .toolbar { grid-template-columns: 1fr; } }
   
-  .emp-name { font-weight: 600; }
-  .emp-passport { color: var(--accent); font-weight: bold; }
-  .emp-points { font-weight: bold; }
-  .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: bold; }
-  .status-wait { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
-  .status-ok { background: rgba(47, 158, 68, 0.15); color: #bbf7d0; border: 1px solid rgba(47, 158, 68, 0.3); }
+  input[type="text"], select {
+    width: 100%; padding: 9px 12px; font-size: 0.88rem; color: var(--text);
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; outline: none;
+  }
 
-  .btn-star { background: transparent; border: 1px solid var(--border); color: var(--muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-  .btn-star.active { color: #fcd34d; border-color: #fcd34d; background: rgba(252, 211, 77, 0.1); }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .tbl th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .tbl tr:hover { background: var(--table-hover); }
+  
+  .col-pass { color: #86efac; font-weight: 700; }
+  .col-num { color: var(--muted); width: 40px; }
+  
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.74rem; font-weight: 700; }
+  .status-pill.ok { background: var(--accent-bg); color: #86efac; border: 1px solid var(--accent-border); }
+  .status-pill.warn { background: var(--amber-bg); color: #fcd34d; border: 1px solid var(--amber-border); }
+
+  .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .btn-icon.star { color: #fbbf24; border-color: #fbbf24; }
+  .btn-icon.active { background: #fbbf24; color: #1a1207; }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- Кнопка Назад -->
-<div class="header-row">
-  <button class="btn-back" id="backBtn">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-    Назад
-  </button>
-  <h2 style="margin:0; font-size:1.1rem;">Недельный отчет</h2>
-</div>
-
-<!-- Вкладки -->
-<div class="tabs">
-  <div class="tab active">Текущая неделя <span class="count" id="tabCount">0</span></div>
-  <div class="tab">Инструкторы СМП <span class="count">0</span></div>
-  <div class="tab">Топ недели</div>
-  <div class="tab">Должники <span class="count" id="tabDebtors">0</span></div>
-  <div class="tab">Прошлые недели</div>
-</div>
-
-<!-- Основная панель -->
-<div class="main-panel">
-  <div class="panel-header">
-    <div class="panel-title">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Сотрудники СМП
-    </div>
-    <button class="btn-refresh" onclick="loadReports()">🔄 Обновить</button>
+<div class="wrap">
+  <div class="header-row">
+    <button class="btn-back" id="backBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Назад
+    </button>
+    <h2 style="margin:0; font-size:1.1rem;">Недельный отчет (Премии)</h2>
   </div>
 
-  <div class="filters-row">
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="Поиск по имени или паспорту...">
-    </div>
-    <select class="filter-select" id="statusFilter">
-      <option value="all">Все статусы</option>
-      <option value="pending">Ожидают премии</option>
-      <option value="approved">Получили премию</option>
-    </select>
-    <div class="total-count">Всего: <span id="totalDisplay">0</span></div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="current">
+      Текущая неделя <span class="count" id="countTotal">0</span>
+    </button>
+    <button class="tab-btn" data-tab="debtors">
+      Ожидают премию <span class="count" id="countPending">0</span>
+    </button>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Имя</th>
-          <th>Паспорт</th>
-          <th>Роль</th>
-          <th>Сумма</th>
-          <th>Статус</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="reportsBody">
-        <!-- Сюда будут загружаться данные -->
-      </tbody>
-    </table>
+  <div class="card" id="tab-current">
+    <div class="card-head">
+      <h2>Список сотрудников</h2>
+      <button class="btn-icon" onclick="loadData()" title="Обновить">🔄</button>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="🔍 Поиск по имени или паспорту...">
+      <select id="filterStatus">
+        <option value="all">Все статусы</option>
+        <option value="pending">⏳ Ожидают</option>
+        <option value="approved">✅ Получили</option>
+      </select>
+      <div style="display:flex;align-items:center;justify-content:flex-end;color:var(--muted);font-size:0.82rem;">
+        Всего: <b id="totalDisplay" style="margin-left:6px;color:var(--accent-2);">0</b>
+      </div>
+    </div>
+
+    <div id="tableContainer">
+      <div style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>
+    </div>
   </div>
 </div>
 
 <script>
   const $ = (id) => document.getElementById(id);
+  // Убедись, что адрес правильный!
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev";
-  
   let allReports = [];
 
-  // Кнопка назад
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
-  async function loadReports() {
-    $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</td></tr>';
+  async function loadData() {
+    $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>';
     try {
       const res = await fetch(WORKER_URL, {
         method: "POST",
@@ -147,23 +138,23 @@
         updateCounts();
         renderTable();
       } else {
-        $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--red);">Ошибка загрузки данных</td></tr>';
+        $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--red);">Ошибка данных</div>';
       }
     } catch(e) {
-      $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--red);">Ошибка сети</td></tr>';
+      $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--red);">Ошибка сети</div>';
     }
   }
 
   function updateCounts() {
     const pending = allReports.filter(r => r.status === 'pending').length;
-    $("tabCount").textContent = allReports.length;
-    $("tabDebtors").textContent = pending;
+    $("countTotal").textContent = allReports.length;
+    $("countPending").textContent = pending;
     $("totalDisplay").textContent = allReports.length;
   }
 
   function renderTable() {
     const search = $("searchInput").value.toLowerCase();
-    const statusFilter = $("statusFilter").value;
+    const statusFilter = $("filterStatus").value;
 
     const filtered = allReports.filter(r => {
       const matchSearch = r.employee_name.toLowerCase().includes(search) || (r.passport && r.passport.includes(search));
@@ -172,32 +163,55 @@
     });
 
     if (filtered.length === 0) {
-      $("reportsBody").innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--muted);">Ничего не найдено</td></tr>';
+      $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Ничего не найдено</div>';
       return;
     }
 
-    $("reportsBody").innerHTML = filtered.map((r, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td><span class="emp-name">${r.employee_name}</span></td>
-        <td><span class="emp-passport">${r.passport || '—'}</span></td>
-        <td>${r.role || '—'}</td>
-        <td><span class="emp-points">${r.total_sum.toLocaleString('ru-RU')} $</span></td>
-        <td>
-          ${r.status === 'approved' 
-            ? '<span class="status-badge status-ok">✅ Получил</span>' 
-            : '<span class="status-badge status-wait">⏳ Ожидает</span>'}
-        </td>
-        <td>
-          <button class="btn-star ${r.status === 'approved' ? 'active' : ''}" onclick="approveBonus(${r.id})" title="Начислить премию">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="${r.status === 'approved' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    let html = `
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="col-num">#</th>
+            <th>Имя</th>
+            <th class="col-hide-sm">Паспорт</th>
+            <th class="col-rank">Должность</th>
+            <th style="text-align:center;">Сумма</th>
+            <th style="text-align:center;">Статус</th>
+            <th style="text-align:right;">Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    filtered.forEach((r, i) => {
+      const isApproved = r.status === 'approved';
+      html += `
+        <tr>
+          <td class="col-num">${i + 1}</td>
+          <td style="font-weight:600;">${r.employee_name}</td>
+          <td class="col-pass">${r.passport || '—'}</td>
+          <td style="color:var(--muted);">${r.role || '—'}</td>
+          <td style="text-align:center;font-weight:700;color:#86efac;">${r.total_sum.toLocaleString('ru-RU')} $</td>
+          <td style="text-align:center;">
+            ${isApproved 
+              ? '<span class="status-pill ok">✅ Получил</span>' 
+              : '<span class="status-pill warn">⏳ Ожидает</span>'}
+          </td>
+          <td style="text-align:right;">
+            <button class="btn-icon ${isApproved ? 'active' : ''}" onclick="approveBonus(${r.id}, ${isApproved})" title="Начислить премию">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="${isApproved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>`;
+    $("tableContainer").innerHTML = html;
   }
 
-  window.approveBonus = async (id) => {
+  window.approveBonus = async (id, isApproved) => {
+    if (isApproved) return; // Уже начислено
     if (!confirm("Начислить премию этому сотруднику?")) return;
     
     try {
@@ -206,17 +220,32 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "approveBonus", id: id })
       });
-      loadReports();
+      loadData();
     } catch(e) {
       alert("Ошибка сети!");
     }
   };
 
   $("searchInput").addEventListener("input", renderTable);
-  $("statusFilter").addEventListener("change", renderTable);
+  $("filterStatus").addEventListener("change", renderTable);
 
-  // Запуск при открытии
-  loadReports();
+  // Переключение вкладок (просто меняем фильтр)
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      if (btn.dataset.tab === 'debtors') {
+        $("filterStatus").value = "pending";
+      } else {
+        $("filterStatus").value = "all";
+      }
+      renderTable();
+    });
+  });
+
+  // Запуск
+  loadData();
 </script>
 </body>
 </html>
