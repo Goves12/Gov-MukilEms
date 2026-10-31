@@ -91,8 +91,8 @@
 </div>
 
 <div class="action-bar">
-  <button class="btn btn-green" id="generateBtn">Сформировать отчет</button>
-  <button class="btn btn-blue" id="copyBtn" style="display:none;">Копировать</button>
+  <button class="btn btn-green" id="generateBtn">Сформировать текст</button>
+  <button class="btn btn-blue" id="sendToReportBtn" style="background:#f59e0b; display:none;">Отправить в Недельный отчет</button>
   <button class="btn btn-red" id="resetBtn">Сбросить</button>
 </div>
 
@@ -188,6 +188,54 @@
     calculateTotal();
     $("reportArea").style.display = "none";
     $("copyBtn").style.display = "none";
+  });
+    // Показываем кнопку отправки после формирования текста
+  const originalGenerate = $("generateBtn").addEventListener("click", () => {
+    // ... (твой старый код генерации) ...
+    // Просто в самом конце старого кода добавь:
+    $("sendToReportBtn").style.display = "flex";
+  });
+
+  // Отправка на сервер
+  $("sendToReportBtn").addEventListener("click", async () => {
+    const name = $("empName").value.trim();
+    const passport = $("empPassport").value.trim();
+    const role = $("empRole").value.trim();
+    const total = calculateTotal();
+
+    if (!name || total === 0) return alert("Заполните имя и добавьте услуги!");
+
+    const btn = $("sendToReportBtn");
+    btn.textContent = "Отправка...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "submitReport", 
+          name: name,
+          passport: passport,
+          role: role,
+          totalSum: total,
+          reportText: $("reportArea").value
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert("✅ Отчет успешно отправлен руководству!");
+        $("sendToReportBtn").style.display = "none";
+      } else {
+        alert("Ошибка: " + data.message);
+      }
+    } catch(e) {
+      alert("Ошибка сети!");
+    } finally {
+      btn.textContent = "Отправить в Недельный отчет";
+      btn.disabled = false;
+    }
   });
 </script>
 </body>
