@@ -201,10 +201,10 @@
     $("loginForm").reset();
   }
 
-  function showDesk(session) {
+    function showDesk(session) {
     $("authScreen").classList.add("hidden");
     $("deskScreen").classList.remove("hidden");
-    $("usersScreen").classList.add("hidden");
+    $("appFrame").classList.add("hidden"); // Скрываем iframe
     $("userChip").classList.add("visible");
     $("userName").textContent = session.login;
     
@@ -222,36 +222,43 @@
     $("greetingTitle").textContent = "Добро пожаловать, " + session.login;
     $("greetingSub").textContent = "Роль: " + session.role;
 
-      // Рисуем плитки
-  const grid = $("appGrid");
-  grid.innerHTML = "";
-  APPS.forEach(a => {
-    if (a.roles && !a.roles.includes(session.role)) return;
-    const tile = document.createElement("div");
-    tile.className = "app-tile";
-    tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
+    // Рисуем плитки
+    const grid = $("appGrid");
+    grid.innerHTML = "";
     
-    // ВОТ ЭТОТ БЛОК МЫ ЗАМЕНЯЕМ
-    tile.addEventListener("click", () => {
-      if (a.id === 'users') {
-        // Открываем iframe с файлом apps/users.html
-        $("appHeader").classList.remove("hidden");
-        $("currentAppTitle").textContent = a.label;
-        $("deskScreen").classList.add("hidden");
-        $("appFrame").classList.remove("hidden");
-        $("appIframe").src = "apps/users.html"; 
-      } 
-      else if (a.id === 'calc') {
-        window.open("calculator.html", "_blank");
-      } 
-      else {
-        alert("Раздел в разработке");
-      }
+    APPS.forEach(a => {
+      if (a.roles && !a.roles.includes(session.role)) return;
+      
+      const tile = document.createElement("div");
+      tile.className = "app-tile";
+      tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
+      
+      tile.addEventListener("click", () => {
+        if (a.id === 'users') {
+          // Показываем экран приложения
+          $("deskScreen").classList.add("hidden");
+          $("appFrame").classList.remove("hidden");
+          
+          // Настраиваем шапку приложения
+          const appHeader = $("appHeader");
+          if(appHeader) appHeader.classList.remove("hidden");
+          const appTitle = $("currentAppTitle");
+          if(appTitle) appTitle.textContent = a.label;
+          
+          // Загружаем iframe
+          $("appIframe").src = "apps/users.html"; 
+        } 
+        else if (a.id === 'calc') {
+          window.open("calculator.html", "_blank");
+        } 
+        else {
+          alert("Раздел в разработке");
+        }
+      });
+      
+      grid.appendChild(tile);
     });
-   }// КОНЕЦ ЗАМЕНЫ
-
-    grid.appendChild(tile);
-  });
+  }
 
   // --- ВХОД (СТУЧИМСЯ В CLOUDFLARE) ---
   $("loginForm").addEventListener("submit", async (e) => {
@@ -271,17 +278,16 @@
         body: JSON.stringify({ action: "login", login: login, hash: hash })
       });
       
-            const data = await res.json();
-      console.log("Ответ от сервера:", data); // <--- Это покажет ответ в консоли
+      const data = await res.json();
+      console.log("Ответ от сервера:", data); // Покажет ответ в консоли F12
 
       if (!data.success) {
         notify($("loginNotification"), data.message || "Неверный логин или пароль", "error");
         return;
-      } 
-      // ... дальше сохранение сессии и проверка isTemp
+      }
 
-      // Сохраняем сессию
-      saveSession({ login: data.login, role: data.role, ts: Date.now() });
+      // Сохраняем сессию (добавили отдел)
+      saveSession({ login: data.login, role: data.role, department: data.department || "СМП", ts: Date.now() });
 
       // Если пароль временный (isTemp = true), кидаем на смену
       if (data.isTemp) {
