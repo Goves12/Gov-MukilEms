@@ -36,7 +36,19 @@
   /* Стили для Devlog */
   .devlog-list { display: flex; flex-direction: column; gap: 15px; }
   .devlog-item { background: var(--panel-2); border-left: 4px solid var(--blue); padding: 15px; border-radius: 8px; position: relative; }
-  .devlog-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  
+  /* Исправленная шапка Devlog (чтобы дата не налезала на крестик) */
+  .devlog-meta { 
+    display: flex; 
+    justify-content: flex-start; 
+    gap: 15px; 
+    font-size: 0.75rem; 
+    color: var(--muted); 
+    margin-bottom: 10px; 
+    padding-bottom: 5px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    padding-right: 35px; /* Отступ справа для кнопки удаления */
+  }
   .devlog-author { font-weight: bold; color: var(--accent); }
   .devlog-text { font-size: 0.9rem; line-height: 1.6; }
   
@@ -47,7 +59,24 @@
   .devlog-text li::marker { color: var(--accent); }
   .devlog-text br { line-height: 1.5; }
 
-  .btn-del-devlog { position: absolute; top: 10px; right: 10px; background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
+  /* Кнопка удаления */
+  .btn-del-devlog { 
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: rgba(239,68,68,0.15); 
+    color: #fca5a5; 
+    border: 1px solid rgba(239,68,68,0.3); 
+    width: 28px; 
+    height: 28px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1rem; 
+    transition: 0.2s; 
+  }
   .btn-del-devlog:hover { background: rgba(239,68,68,0.3); color: white; }
 
   .add-form { display: flex; gap: 10px; margin-top: 15px; }
@@ -178,17 +207,24 @@
     const canDelete = ['Бог', 'Министр здравоохранения'].includes(userRole);
 
     $("devlogList").innerHTML = entries.map(e => {
-      const date = new Date(e.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      // КРАСИВЫЙ ФОРМАТ ДАТЫ
+      const dateObj = new Date(e.created_at);
+      const dateStr = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+      const timeStr = dateObj.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      const today = new Date();
+      const isToday = dateObj.getDate() === today.getDate() && 
+                      dateObj.getMonth() === today.getMonth() && 
+                      dateObj.getFullYear() === today.getFullYear();
+      const displayDate = isToday ? `Сегодня, ${timeStr}` : `${dateStr}, ${timeStr}`;
       
-      // Красивый парсер текста (Markdown-lite)
+      // ПАРСЕР ТЕКСТА
       let formatted = e.text
-        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') // Жирный заголовок
-        .replace(/ • /g, '</li><li>') // Разделитель для списка
-        .replace(/^(.*?)<\/li><li>/, '<ul><li>$1</li><li>') // Начало списка
-        .replace(/<\/li><li>(.*?)$/, '</li><li>$1</li></ul>') // Конец списка
+        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+        .replace(/ • /g, '</li><li>')
+        .replace(/^(.*?)<\/li><li>/, '<ul><li>$1</li><li>')
+        .replace(/<\/li><li>(.*?)$/, '</li><li>$1</li></ul>')
         .replace(/\n/g, '<br>');
 
-      // Если текст не начинался с " • ", то закрываем теги как надо
       if (!e.text.includes(' • ')) {
          formatted = e.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
       }
@@ -198,7 +234,7 @@
           ${canDelete ? `<button class="btn-del-devlog" onclick="deleteDevlog(${e.id})" title="Удалить запись">✖</button>` : ''}
           <div class="devlog-meta">
             <span class="devlog-author">👤 ${e.author}</span>
-            <span>${date}</span>
+            <span style="color: var(--muted); font-weight: normal;">${displayDate}</span>
           </div>
           <div class="devlog-text">${formatted}</div>
         </div>
