@@ -14,40 +14,32 @@
   body { font-family: system-ui, sans-serif; background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%); color: var(--text); padding: 20px; min-height: 100vh; }
   .wrap { max-width: 1100px; margin: 0 auto; }
   
-  /* Шапка */
   .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
   
-  /* Вкладки */
   .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
   .tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
   .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
   .tab-btn .count { background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; }
 
-  /* Кнопки */
   .btn-purple { background: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .btn-add { background: #06b6d4; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
-  /* Карточка */
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
   .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   
-  /* Панель фильтров */
   .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
   .filter-bar input { flex: 1; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
   .filter-bar select { width: 200px; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
 
-  /* Таблица */
   .tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
   .tbl th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); padding: 12px 10px; border-bottom: 1px solid var(--border); }
   .tbl td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   
-  /* Кнопки действий в таблице */
   .action-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; }
   .action-btn:hover { background: var(--border); color: white; }
 
-  /* Форма добавления */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
   @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
   .form-group { display: flex; flex-direction: column; gap: 8px; }
@@ -74,7 +66,6 @@
     <h2 style="margin:0; font-size:1.1rem;">Персонал больницы</h2>
   </div>
 
-  <!-- Вкладки -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="active">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
@@ -86,7 +77,6 @@
     </button>
   </div>
 
-  <!-- Основной блок -->
   <div class="card">
     <div class="card-head">
       <h3 style="font-size:1.1rem; margin:0;">Список сотрудников</h3>
@@ -106,7 +96,6 @@
       </div>
     </div>
 
-    <!-- Фильтры -->
     <div class="filter-bar">
       <input type="text" id="searchInput" placeholder="🔍 Поиск по имени или № паспорта...">
       <select id="filterDept">
@@ -118,11 +107,9 @@
       </div>
     </div>
 
-    <!-- Таблица -->
     <div id="tableContainer"></div>
   </div>
 
-  <!-- Форма добавления (скрыта по умолчанию) -->
   <div class="card hidden" id="formBlock">
     <div class="card-head">
       <h3 style="font-size:1.05rem; margin:0;">Новый сотрудник</h3>
@@ -145,13 +132,7 @@
       <div class="form-group">
         <label>Ранг</label>
         <select id="newRank">
-          <option value="1">1 — Стажёр</option>
-          <option value="2">2 — Интерн</option>
-          <option value="3">3 — Фельдшер</option>
-          <option value="4">4 — Врач</option>
-          <option value="5">5 — Заведующий отделением</option>
-          <option value="10">10 — Заместитель главного врача</option>
-          <option value="17">17 — Министр</option>
+          <!-- Сюда JS вставит 28 рангов -->
         </select>
       </div>
       <div class="form-group" style="grid-column: 1 / -1;">
@@ -179,9 +160,49 @@
   let allStaff = [];
   let currentTab = 'active';
 
+  // СПИСОК РАНГОВ (28 штук)
+  const RANKS = [
+    { id: 1, name: "Стажёр" },
+    { id: 2, name: "Менеджер" },
+    { id: 3, name: "Адвокат" },
+    { id: 4, name: "Агент USSS" },
+    { id: 5, name: "Спец. Агент USSS" },
+    { id: 6, name: "Старший менеджер" },
+    { id: 7, name: "Старший адвокат" },
+    { id: 8, name: "Судья" },
+    { id: 9, name: "Инструктор" },
+    { id: 10, name: "Прокурор" },
+    { id: 11, name: "Федеральный прокурор" },
+    { id: 12, name: "Зам. Глава Коллегии Адв" },
+    { id: 13, name: "Зам. Директора USSS" },
+    { id: 14, name: "Глава Коллегии Адвокатов" },
+    { id: 15, name: "Директор USSS" },
+    { id: 16, name: "Представитель ОС" },
+    { id: 17, name: "Заместитель Министра" },
+    { id: 18, name: "Зам. Главы Администратора" },
+    { id: 19, name: "Зам. Ген. Прокурора" },
+    { id: 20, name: "Министр" },
+    { id: 21, name: "Верховный Судья" },
+    { id: 22, name: "Глава Администрации" },
+    { id: 23, name: "Министр Финансов" },
+    { id: 24, name: "Советник Губернатора" },
+    { id: 25, name: "Генеральный Прокурор" },
+    { id: 26, name: "Представитель ВС" },
+    { id: 27, name: "Вице-Губернатор" },
+    { id: 28, name: "Губернатор" }
+  ];
+
+  // Генерируем выпадающий список рангов при загрузке
+  const rankSelect = $("newRank");
+  RANKS.forEach(r => {
+    const opt = document.createElement("option");
+    opt.value = r.id;
+    opt.textContent = `${r.id} — ${r.name}`;
+    rankSelect.appendChild(opt);
+  });
+
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
-  // Скрываем кнопки добавления, если нет прав
   if (!canEdit) {
     $("addBtn").style.display = "none";
   }
@@ -246,13 +267,17 @@
     `;
 
     filtered.forEach((s, i) => {
+      // Расшифровка ранга для таблицы
+      const rankObj = RANKS.find(r => r.id == s.rank);
+      const rankName = rankObj ? rankObj.name : s.rank;
+
       html += `
         <tr>
           <td>${i + 1}</td>
           <td style="font-weight:600;">${s.name}</td>
           <td style="color:#86efac; font-weight:bold;">${s.passport || '—'}</td>
           <td>${s.position || '—'}</td>
-          <td>${s.rank || '—'}</td>
+          <td>${s.rank} — ${rankName}</td>
           <td><span style="background:rgba(59,130,246,0.2); color:#93c5fd; padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.department || 'МинЗдрав'}</span></td>
           ${canEdit ? `
             <td style="text-align:right;">
@@ -272,11 +297,7 @@
 
   window.fireStaff = async (id) => {
     try {
-      await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "fireStaff", id })
-      });
+      await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "fireStaff", id }) });
       showToast("Сотрудник уволен");
       loadStaff();
     } catch(e) { showToast("Ошибка", "red"); }
@@ -284,11 +305,7 @@
 
   window.restoreStaff = async (id) => {
     try {
-      await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "restoreStaff", id })
-      });
+      await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "restoreStaff", id }) });
       showToast("Сотрудник восстановлен");
       loadStaff();
     } catch(e) { showToast("Ошибка", "red"); }
@@ -316,7 +333,6 @@
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-  // Переключение вкладок
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
