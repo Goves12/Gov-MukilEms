@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>База Discord</title>
+<title>База Discord (Управление)</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0b0f14; --panel: #16202e; --panel-2: #1c2839;
     --text: #e8eef7; --muted: #8496ab; --border: #26344a;
-    --accent: #2f9e44; --discord: #5865F2;
+    --accent: #2f9e44; --discord: #5865F2; --red: #ef4444;
   }
   body { font-family: system-ui, sans-serif; background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%); color: var(--text); padding: 20px; min-height: 100vh; }
-  .wrap { max-width: 1000px; margin: 0 auto; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
   
   .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
@@ -28,7 +28,20 @@
   
   .discord-id { color: #a5b4fc; font-weight: bold; font-family: monospace; }
   .username { font-weight: 600; }
-  .time { color: var(--muted); font-size: 0.85rem; }
+  
+  /* Выпадающие списки */
+  .inline-select {
+    padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 0.85rem; outline: none; cursor: pointer;
+  }
+  .inline-select:focus { border-color: var(--accent); }
+
+  /* Кнопки */
+  .btn-del { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+  .btn-del:hover { background: rgba(239,68,68,0.3); color: white; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f9e44; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 2000; pointer-events: none; }
+  .toast.show { opacity: 1; bottom: 30px; }
 </style>
 </head>
 <body>
@@ -39,7 +52,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Назад
     </button>
-    <h2 style="margin:0; font-size:1.1rem;">База Discord</h2>
+    <h2 style="margin:0; font-size:1.1rem;">База Discord (Управление)</h2>
   </div>
 
   <div class="card">
@@ -57,9 +70,14 @@
   </div>
 </div>
 
+<div class="toast" id="toastMsg">Готово</div>
+
 <script>
   const $ = (id) => document.getElementById(id);
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev";
+
+  const ROLES = ['Бог', 'Министр здравоохранения', 'Старший состав', 'Сотрудник'];
+  const DEPARTMENTS = ['МинЗдрав', 'СМП', 'ПСЭС', 'АБ', 'ОК', 'ИТ'];
 
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
@@ -90,8 +108,11 @@
           <tr>
             <th>#</th>
             <th>Discord ID</th>
-            <th>Имя пользователя</th>
-            <th>Время входа</th>
+            <th>Имя</th>
+            <th>Роль</th>
+            <th>Отдел</th>
+            <th>Время</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -99,18 +120,75 @@
 
     logs.forEach((l, i) => {
       const date = new Date(l.login_time).toLocaleString('ru-RU');
+      
+      // Генерируем выпадающий список ролей
+      let roleOptions = ROLES.map(r => `<option value="${r}" ${l.role === r ? 'selected' : ''}>${r}</option>`).join('');
+      
+      // Генерируем выпадающий список отделов
+      let deptOptions = DEPARTMENTS.map(d => `<option value="${d}" ${l.department === d ? 'selected' : ''}>${d}</option>`).join('');
+
       html += `
         <tr>
           <td>${i + 1}</td>
           <td class="discord-id">${l.discord_id}</td>
           <td class="username">${l.username}</td>
-          <td class="time">${date}</td>
+          <td>
+            <select class="inline-select" onchange="updateUser(${l.id}, this.value, '${l.department}')">
+              ${roleOptions}
+            </select>
+          </td>
+          <td>
+            <select class="inline-select" onchange="updateUser(${l.id}, '${l.role}', this.value)">
+              ${deptOptions}
+            </select>
+          </td>
+          <td style="color:var(--muted); font-size:0.8rem;">${date}</td>
+          <td style="text-align:right;">
+            <button class="btn-del" onclick="deleteUser(${l.id})" title="Удалить">🗑️</button>
+          </td>
         </tr>
       `;
     });
 
     html += `</tbody></table>`;
     $("tableContainer").innerHTML = html;
+  }
+
+  window.updateUser = async (id, role, department) => {
+    try {
+      await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "updateDiscordUser", id, role, department })
+      });
+      showToast("✅ Данные обновлены");
+      // Перезагружаем, чтобы обновить другие селекты, если нужно
+      loadLogs(); 
+    } catch(e) {
+      showToast("Ошибка обновления", "red");
+    }
+  };
+
+  window.deleteUser = async (id) => {
+    try {
+      await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deleteDiscordUser", id })
+      });
+      showToast("🗑️ Запись удалена");
+      loadLogs();
+    } catch(e) {
+      showToast("Ошибка удаления", "red");
+    }
+  };
+
+  function showToast(msg, color = "green") {
+    const t = $("toastMsg");
+    t.textContent = msg;
+    t.style.background = color === "red" ? "#ef4444" : "#2f9e44";
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
   }
 
   loadLogs();
