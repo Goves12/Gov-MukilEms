@@ -264,11 +264,13 @@
           <td>${s.position || '—'}</td>
           <td>${s.rank} — ${rankName}</td>
           <td><span style="background:rgba(59,130,246,0.2); color:#93c5fd; padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.department || 'МинЗдрав'}</span></td>
+          
           ${canEdit ? `
-            <td style="text-align:right;">
+            <td style="text-align:right; white-space:nowrap;">
               ${currentTab === 'active' 
                 ? `<button class="action-btn" title="Уволить" onclick="fireStaff(${s.id})" style="color:#fca5a5;">✖</button>`
-                : `<button class="action-btn" title="Восстановить" onclick="restoreStaff(${s.id})" style="color:#86efac;">↺</button>`
+                : `<button class="action-btn" title="Восстановить" onclick="restoreStaff(${s.id})" style="color:#86efac;">↺</button>
+                   <button class="action-btn" title="Удалить навсегда" onclick="hardDeleteStaff(${s.id})" style="color:#ef4444; border-color:rgba(239,68,68,0.3);">🗑️</button>`
               }
             </td>
           ` : ''}
@@ -294,6 +296,21 @@
       showToast("Сотрудник восстановлен");
       loadStaff();
     } catch(e) { showToast("Ошибка", "red"); }
+  };
+
+  // ПОЛНОЕ УДАЛЕНИЕ ИЗ БАЗЫ
+  window.hardDeleteStaff = async (id) => {
+    try {
+      await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deleteStaff", id })
+      });
+      showToast("Сотрудник полностью удален из базы");
+      loadStaff();
+    } catch(e) {
+      showToast("Ошибка при удалении", "red");
+    }
   };
 
   window.addStaff = async () => {
@@ -365,16 +382,10 @@
           const parts = line.split('|').map(p => p.trim());
           if (parts.length < 4) continue;
 
-          // Убираем звездочки из имени
           const name = parts[0].replace(/\*/g, '').trim();
-          
-          // Достаем паспорт (только цифры)
           const passport = parts[1].replace(/\D/g, '');
-          
-          // Должность (убираем звездочки)
           const position = parts[2].replace(/\*/g, '').trim();
           
-          // Ранг (число, или маппинг Junior/Middle/Senior)
           let rankStr = parts[3].replace(/\*/g, '').trim();
           let rank = rankStr.replace(/\D/g, '');
           if (!rank) {
@@ -410,7 +421,7 @@
             })
           });
           addedCount++;
-        } // <--- ЗДЕСЬ БЫЛА ПОТЕРЯНА СКОБКА
+        } 
 
         if (addedCount > 0) {
           showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
