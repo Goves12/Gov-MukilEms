@@ -3,85 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>МинЗдрав Отдела</title>
+<title>Персонал больницы</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0b0f14; --panel: #16202e; --panel-2: #1c2839; --panel-3: #223147;
     --text: #e8eef7; --muted: #8496ab; --border: #26344a; --accent: #2f9e44; --red: #ef4444;
-    --input-bg: #0c1420;
+    --input-bg: #0c1420; --blue: #3b82f6;
   }
-  body { font-family: system-ui, sans-serif; background: transparent; color: var(--text); padding: 10px; }
+  body { font-family: system-ui, sans-serif; background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%); color: var(--text); padding: 20px; min-height: 100vh; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
   
-  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .header-left { display: flex; align-items: center; gap: 12px; }
+  /* Шапка */
+  .header-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
   .btn-back { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: white; cursor: pointer; font-weight: 600; }
   
-  .btn-primary { background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-  .btn-danger { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-  .btn-danger:hover { background: rgba(239,68,68,0.3); }
+  /* Вкладки */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+  .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .tab-btn .count { background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; }
 
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
-  .card h3 { font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-  
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
-  @media (max-width: 800px) { .form-grid { grid-template-columns: 1fr 1fr; } }
-  
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  label { font-size: 0.75rem; color: var(--muted); font-weight: 600; }
-  input { padding: 9px 12px; font-size: 0.9rem; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); outline: none; }
+  /* Кнопки */
+  .btn-purple { background: #8b5cf6; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-add { background: #06b6d4; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
-  .tbl { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  .tbl th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); padding: 9px 10px; border-bottom: 1px solid var(--border); }
-  .tbl td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  .tbl tr:hover { background: rgba(255,255,255,0.02); }
+  /* Карточка */
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   
+  /* Панель фильтров */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+  .filter-bar input { flex: 1; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
+  .filter-bar select { width: 200px; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
+
+  /* Таблица */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .tbl th { text-align: left; font-size: 0.7rem; text-transform: uppercase; color: var(--muted); padding: 12px 10px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  
+  /* Кнопки действий в таблице */
+  .action-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; }
+  .action-btn:hover { background: var(--border); color: white; }
+
+  /* Форма добавления */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+  @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .form-group input, .form-group select { padding: 12px; font-size: 0.95rem; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); outline: none; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  
+  .btn-submit { width: 100%; padding: 14px; background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+  .btn-submit:hover { background: #2563eb; color: white; }
+
+  .hidden { display: none !important; }
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f9e44; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 2000; pointer-events: none; }
   .toast.show { opacity: 1; bottom: 30px; }
-  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<div class="header-row">
-  <div class="header-left">
+<div class="wrap">
+  <div class="header-row">
     <button class="btn-back" id="backBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
       Назад
     </button>
-    <h2 style="margin:0; font-size:1.1rem;">МинЗдрав Отдела</h2>
+    <h2 style="margin:0; font-size:1.1rem;">Персонал больницы</h2>
   </div>
-</div>
 
-<!-- Форма добавления (видна только админам) -->
-<div class="card hidden" id="adminForm">
-  <h3>Добавить нового сотрудника</h3>
-  <div class="form-grid">
-    <div class="form-group">
-      <label>Имя и Фамилия</label>
-      <input type="text" id="newName" placeholder="Todd West">
-    </div>
-    <div class="form-group">
-      <label>Паспорт</label>
-      <input type="text" id="newPassport" placeholder="189097">
-    </div>
-    <div class="form-group">
-      <label>Должность</label>
-      <input type="text" id="newPosition" placeholder="Министр">
-    </div>
-    <div class="form-group">
-      <label>Ранг</label>
-      <input type="number" id="newRank" placeholder="17">
-    </div>
-    <button class="btn-primary" onclick="addStaff()">Добавить</button>
+  <!-- Вкладки -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Активные <span class="count" id="countActive">0</span>
+    </button>
+    <button class="tab-btn" data-tab="fired">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      Уволенные <span class="count" id="countFired">0</span>
+    </button>
   </div>
-</div>
 
-<!-- Список сотрудников -->
-<div class="card">
-  <h3>Список сотрудников (МинЗдрав)</h3>
-  <div id="staffList">
-    <div style="text-align:center; padding:20px;">Загрузка...</div>
+  <!-- Основной блок -->
+  <div class="card">
+    <div class="card-head">
+      <h3 style="font-size:1.1rem; margin:0;">Список сотрудников</h3>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-purple" onclick="showToast('🤖 ИИ-Импорт скоро появится!', 'red')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          ИИ-Импорт
+        </button>
+        <button class="btn-outline" onclick="showToast('Функция в разработке', 'red')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Импорт / экспорт
+        </button>
+        <button class="btn-add" id="addBtn" onclick="toggleForm()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Добавить
+        </button>
+      </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Поиск по имени или № паспорта...">
+      <select id="filterDept">
+        <option value="all">Все отделы</option>
+        <option value="МинЗдрав">МинЗдрав</option>
+      </select>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:0.85rem;">
+        Всего: <b id="totalDisplay" style="margin-left:6px; color:var(--accent);">0</b>
+      </div>
+    </div>
+
+    <!-- Таблица -->
+    <div id="tableContainer"></div>
+  </div>
+
+  <!-- Форма добавления (скрыта по умолчанию) -->
+  <div class="card hidden" id="formBlock">
+    <div class="card-head">
+      <h3 style="font-size:1.05rem; margin:0;">Новый сотрудник</h3>
+      <button class="btn-back" onclick="toggleForm()">Отмена</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Имя Фамилия</label>
+        <input type="text" id="newName" placeholder="Введите имя...">
+      </div>
+      <div class="form-group">
+        <label>№ Паспорта</label>
+        <input type="text" id="newPassport" placeholder="Введите паспорт...">
+      </div>
+      <div class="form-group">
+        <label>Должность</label>
+        <input type="text" id="newPosition" placeholder="Например: Стажёр">
+      </div>
+      <div class="form-group">
+        <label>Ранг</label>
+        <select id="newRank">
+          <option value="1">1 — Стажёр</option>
+          <option value="2">2 — Интерн</option>
+          <option value="3">3 — Фельдшер</option>
+          <option value="4">4 — Врач</option>
+          <option value="5">5 — Заведующий отделением</option>
+          <option value="10">10 — Заместитель главного врача</option>
+          <option value="17">17 — Министр</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label>Отдел</label>
+        <select id="newDepartment">
+          <option value="МинЗдрав">МинЗдрав</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="addStaff()">Добавить сотрудника</button>
   </div>
 </div>
 
@@ -91,16 +172,22 @@
   const $ = (id) => document.getElementById(id);
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
   
-  // Получаем роль из URL (передается из index.html)
   const urlParams = new URLSearchParams(window.location.search);
   const userRole = urlParams.get('role') || 'Сотрудник';
   const canEdit = ['Бог', 'Министр здравоохранения', 'Старший состав'].includes(userRole);
 
+  let allStaff = [];
+  let currentTab = 'active';
+
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
 
-  // Показываем форму, если есть права
-  if (canEdit) {
-    $("adminForm").classList.remove("hidden");
+  // Скрываем кнопки добавления, если нет прав
+  if (!canEdit) {
+    $("addBtn").style.display = "none";
+  }
+
+  function toggleForm() {
+    $("formBlock").classList.toggle("hidden");
   }
 
   async function loadStaff() {
@@ -111,44 +198,68 @@
         body: JSON.stringify({ action: "getStaff" })
       });
       const data = await res.json();
-      
-      if (data.success && data.staff.length > 0) {
-        renderStaff(data.staff);
-      } else {
-        $("staffList").innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Нет сотрудников</div>';
-      }
+      allStaff = data.staff || [];
+      updateCounts();
+      renderTable();
     } catch(e) {
-      $("staffList").innerHTML = '<div style="text-align:center; padding:20px; color:red;">Ошибка загрузки</div>';
+      $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:red;">Ошибка загрузки</div>';
     }
   }
 
-  function renderStaff(staff) {
+  function updateCounts() {
+    $("countActive").textContent = allStaff.filter(s => !s.fired).length;
+    $("countFired").textContent = allStaff.filter(s => s.fired).length;
+  }
+
+  function renderTable() {
+    const search = $("searchInput").value.toLowerCase();
+    const deptFilter = $("filterDept").value;
+
+    const filtered = allStaff.filter(s => {
+      const matchStatus = currentTab === 'active' ? !s.fired : s.fired;
+      const matchSearch = (s.name || "").toLowerCase().includes(search) || (s.passport || "").includes(search);
+      const matchDept = deptFilter === 'all' || s.department === deptFilter;
+      return matchStatus && matchSearch && matchDept;
+    });
+
+    $("totalDisplay").textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">Ничего не найдено</div>';
+      return;
+    }
+
     let html = `
       <table class="tbl">
         <thead>
           <tr>
             <th>#</th>
-            <th>Имя</th>
-            <th>Паспорт</th>
+            <th>Имя Фамилия</th>
+            <th>№ Паспорта</th>
             <th>Должность</th>
             <th>Ранг</th>
+            <th>Отдел</th>
             ${canEdit ? '<th style="text-align:right;">Действие</th>' : ''}
           </tr>
         </thead>
         <tbody>
     `;
 
-    staff.forEach((s, i) => {
+    filtered.forEach((s, i) => {
       html += `
         <tr>
           <td>${i + 1}</td>
           <td style="font-weight:600;">${s.name}</td>
           <td style="color:#86efac; font-weight:bold;">${s.passport || '—'}</td>
           <td>${s.position || '—'}</td>
-          <td style="color:#c4b5fd; font-weight:bold;">${s.rank || '—'}</td>
+          <td>${s.rank || '—'}</td>
+          <td><span style="background:rgba(59,130,246,0.2); color:#93c5fd; padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.department || 'МинЗдрав'}</span></td>
           ${canEdit ? `
             <td style="text-align:right;">
-              <button class="btn-danger" onclick="deleteStaff(${s.id})">Уволить</button>
+              ${currentTab === 'active' 
+                ? `<button class="action-btn" title="Уволить" onclick="fireStaff(${s.id})" style="color:#fca5a5;">✖</button>`
+                : `<button class="action-btn" title="Восстановить" onclick="restoreStaff(${s.id})" style="color:#86efac;">↺</button>`
+              }
             </td>
           ` : ''}
         </tr>
@@ -156,14 +267,39 @@
     });
 
     html += `</tbody></table>`;
-    $("staffList").innerHTML = html;
+    $("tableContainer").innerHTML = html;
   }
+
+  window.fireStaff = async (id) => {
+    try {
+      await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "fireStaff", id })
+      });
+      showToast("Сотрудник уволен");
+      loadStaff();
+    } catch(e) { showToast("Ошибка", "red"); }
+  };
+
+  window.restoreStaff = async (id) => {
+    try {
+      await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restoreStaff", id })
+      });
+      showToast("Сотрудник восстановлен");
+      loadStaff();
+    } catch(e) { showToast("Ошибка", "red"); }
+  };
 
   window.addStaff = async () => {
     const name = $("newName").value.trim();
     const passport = $("newPassport").value.trim();
     const position = $("newPosition").value.trim();
-    const rank = $("newRank").value.trim();
+    const rank = $("newRank").value;
+    const department = $("newDepartment").value;
 
     if (!name || !passport) return showToast("Введите имя и паспорт", "red");
 
@@ -171,32 +307,27 @@
       await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "addStaff", 
-          name, passport, position, rank 
-        })
+        body: JSON.stringify({ action: "addStaff", name, passport, position, rank, department })
       });
       showToast("✅ Сотрудник добавлен");
-      $("newName").value = ""; $("newPassport").value = ""; $("newPosition").value = ""; $("newRank").value = "";
+      $("newName").value = ""; $("newPassport").value = ""; $("newPosition").value = "";
+      toggleForm();
       loadStaff();
-    } catch(e) {
-      showToast("Ошибка сети", "red");
-    }
+    } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-  window.deleteStaff = async (id) => {
-    try {
-      await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "deleteStaff", id })
-      });
-      showToast("✅ Сотрудник уволен");
-      loadStaff();
-    } catch(e) {
-      showToast("Ошибка сети", "red");
-    }
-  };
+  // Переключение вкладок
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      renderTable();
+    });
+  });
+
+  $("searchInput").addEventListener("input", renderTable);
+  $("filterDept").addEventListener("change", renderTable);
 
   function showToast(msg, color = "green") {
     const t = $("toastMsg");
