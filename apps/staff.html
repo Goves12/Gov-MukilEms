@@ -166,33 +166,15 @@
 
   // СПИСОК РАНГОВ (28 штук)
   const RANKS = [
-    { id: 1, name: "Стажёр" },
-    { id: 2, name: "Менеджер" },
-    { id: 3, name: "Адвокат" },
-    { id: 4, name: "Агент USSS" },
-    { id: 5, name: "Спец. Агент USSS" },
-    { id: 6, name: "Старший менеджер" },
-    { id: 7, name: "Старший адвокат" },
-    { id: 8, name: "Судья" },
-    { id: 9, name: "Инструктор" },
-    { id: 10, name: "Прокурор" },
-    { id: 11, name: "Федеральный прокурор" },
-    { id: 12, name: "Зам. Глава Коллегии Адв" },
-    { id: 13, name: "Зам. Директора USSS" },
-    { id: 14, name: "Глава Коллегии Адвокатов" },
-    { id: 15, name: "Директор USSS" },
-    { id: 16, name: "Представитель ОС" },
-    { id: 17, name: "Заместитель Министра" },
-    { id: 18, name: "Зам. Главы Администратора" },
-    { id: 19, name: "Зам. Ген. Прокурора" },
-    { id: 20, name: "Министр" },
-    { id: 21, name: "Верховный Судья" },
-    { id: 22, name: "Глава Администрации" },
-    { id: 23, name: "Министр Финансов" },
-    { id: 24, name: "Советник Губернатора" },
-    { id: 25, name: "Генеральный Прокурор" },
-    { id: 26, name: "Представитель ВС" },
-    { id: 27, name: "Вице-Губернатор" },
+    { id: 1, name: "Стажёр" }, { id: 2, name: "Менеджер" }, { id: 3, name: "Адвокат" },
+    { id: 4, name: "Агент USSS" }, { id: 5, name: "Спец. Агент USSS" }, { id: 6, name: "Старший менеджер" },
+    { id: 7, name: "Старший адвокат" }, { id: 8, name: "Судья" }, { id: 9, name: "Инструктор" },
+    { id: 10, name: "Прокурор" }, { id: 11, name: "Федеральный прокурор" }, { id: 12, name: "Зам. Глава Коллегии Адв" },
+    { id: 13, name: "Зам. Директора USSS" }, { id: 14, name: "Глава Коллегии Адвокатов" }, { id: 15, name: "Директор USSS" },
+    { id: 16, name: "Представитель ОС" }, { id: 17, name: "Заместитель Министра" }, { id: 18, name: "Зам. Главы Администратора" },
+    { id: 19, name: "Зам. Ген. Прокурора" }, { id: 20, name: "Министр" }, { id: 21, name: "Верховный Судья" },
+    { id: 22, name: "Глава Администрации" }, { id: 23, name: "Министр Финансов" }, { id: 24, name: "Советник Губернатора" },
+    { id: 25, name: "Генеральный Прокурор" }, { id: 26, name: "Представитель ВС" }, { id: 27, name: "Вице-Губернатор" },
     { id: 28, name: "Губернатор" }
   ];
 
@@ -336,10 +318,15 @@
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-    // Обработка фото для ИИ
+  // Обработка фото для ИИ
   async function handleAIImage(event) {
     const file = event.target.files[0];
     if (!file) return;
+
+    // Проверка размера файла (не больше 4 МБ)
+    if (file.size > 4 * 1024 * 1024) {
+      return showToast("❌ Картинка слишком большая (макс 4 МБ). Сожмите или обрежьте её.", "red");
+    }
 
     showToast("🤖 ИИ смотрит на картинку... Подождите", "blue");
 
@@ -353,15 +340,18 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "aiImportStaff", image: base64Image })
         });
+        
         const data = await res.json();
+        
+        // ВЫВОДИМ СЫРОЙ ОТВЕТ В КОНСОЛЬ (F12)
+        console.log("Ответ от ИИ:", data);
 
         if (data.success && data.staff && data.staff.length > 0) {
           let addedCount = 0;
           for (const person of data.staff) {
-            // Если ИИ не нашел ранг, ставим 1
             let finalRank = person.rank ? String(person.rank).replace(/\D/g, '') : "1";
-            if (finalRank === "Leader") finalRank = "28";
-            if (!finalRank) finalRank = "1";
+            if (person.rank === "Leader") finalRank = "28";
+            if (!finalRank || finalRank === "0") finalRank = "1";
 
             await fetch(WORKER_URL, {
               method: "POST",
@@ -372,7 +362,7 @@
                 passport: person.passport || "00000", 
                 position: person.position || "Сотрудник", 
                 rank: finalRank, 
-                department: "МинЗдрав" // Отдел жестко МинЗдрав
+                department: "МинЗдрав"
               })
             });
             addedCount++;
@@ -380,7 +370,8 @@
           showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
           loadStaff();
         } else {
-          showToast("❌ ИИ не смог найти сотрудников на фото", "red");
+          // ПОКАЗЫВАЕМ ОШИБКУ ОТ СЕРВЕРА
+          showToast(`❌ ${data.message || "ИИ не смог найти сотрудников на фото"}`, "red");
         }
       } catch (err) {
         console.error(err);
