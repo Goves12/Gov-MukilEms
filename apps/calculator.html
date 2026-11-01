@@ -100,7 +100,6 @@
 
 <script>
   const $ = (id) => document.getElementById(id);
-  // Убедись, что адрес правильный!
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
 
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
@@ -150,7 +149,7 @@
     const role = $("empRole").value.trim() || "Не указана";
     const total = calculateTotal();
 
-    if (total === 0) return alert("Введите количество хотя бы для одной услуги!");
+    if (total === 0) return showToast("Введите количество хотя бы для одной услуги!", "red");
 
     let text = `*** Работник: *** ${name}\n`;
     text += `*** Номер паспорта: *** ${passport}\n`;
@@ -170,20 +169,19 @@
 
     $("reportArea").value = text;
     
-    // Копируем в буфер
     navigator.clipboard.writeText(text).then(() => {
-      alert("✅ Текст сформирован и скопирован!");
+      showToast("✅ Текст сформирован и скопирован!");
     });
   });
 
-  // 2. Отправить в Недельный отчет (Отправляет напрямую в облако)
+  // 2. Отправить в Недельный отчет
   $("sendToReportBtn").addEventListener("click", async () => {
     const name = $("empName").value.trim();
     const passport = $("empPassport").value.trim();
     const role = $("empRole").value.trim();
     const total = calculateTotal();
 
-    if (!name || total === 0) return alert("Заполните имя и добавьте услуги!");
+    if (!name || total === 0) return showToast("Заполните имя и добавьте услуги!", "red");
 
     const btn = $("sendToReportBtn");
     btn.textContent = "Отправка...";
@@ -204,9 +202,8 @@
       });
       const data = await res.json();
 
-            if (data.success) {
+      if (data.success) {
         showToast("✅ Отчет успешно отправлен руководству!");
-        $("sendToReportBtn").style.display = "none";
       } else {
         showToast("❌ Ошибка: " + data.message, "red");
       }
@@ -216,6 +213,7 @@
       btn.textContent = "Отправить в Недельный отчет";
       btn.disabled = false;
     }
+  });
 
   // 3. Сброс
   $("resetBtn").addEventListener("click", () => {
@@ -224,8 +222,8 @@
     calculateTotal();
     $("reportArea").value = "";
   });
-  
-    // Красивая плашка вместо alert
+
+  // Плашка вместо alert
   function showToast(message, color = "green") {
     const toast = document.createElement("div");
     toast.textContent = message;
