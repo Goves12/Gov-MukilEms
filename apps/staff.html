@@ -318,7 +318,7 @@
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-  // Обработка фото для ИИ
+   // Обработка фото для ИИ
   async function handleAIImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -328,7 +328,7 @@
       return showToast("❌ Картинка слишком большая (макс 4 МБ). Сожмите или обрежьте её.", "red");
     }
 
-    showToast("🤖 ИИ смотрит на картинку... Подождите", "blue");
+    showToast("🤖 ИИ анализирует фото...", "blue");
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -342,9 +342,7 @@
         });
         
         const data = await res.json();
-        
-        // ВЫВОДИМ СЫРОЙ ОТВЕТ В КОНСОЛЬ (F12)
-        console.log("Ответ от ИИ:", data);
+        console.log("Ответ от ИИ:", data); // Смотрим в F12
 
         if (data.success && data.staff && data.staff.length > 0) {
           let addedCount = 0;
@@ -370,8 +368,8 @@
           showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
           loadStaff();
         } else {
-          // ПОКАЗЫВАЕМ ОШИБКУ ОТ СЕРВЕРА
-          showToast(`❌ ${data.message || "ИИ не смог найти сотрудников на фото"}`, "red");
+          // Показываем ошибку от сервера
+          showToast(`❌ ${data.message}`, "red");
         }
       } catch (err) {
         console.error(err);
