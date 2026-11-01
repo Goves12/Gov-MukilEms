@@ -57,7 +57,6 @@
     border-radius: 6px; color: #fcd34d; font-weight: bold;
   }
 
-  /* Модалка */
   .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .modal-bonus { width: 100%; max-width: 800px; background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%); border: 1px solid var(--border-strong); border-radius: 16px; padding: 20px; }
   .bonus-section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
@@ -67,7 +66,6 @@
   .btn-copy-bonus { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 14px; background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a1207; font-size: 1rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; }
   .hidden { display: none !important; }
 
-  /* Тост об успехе */
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f9e44; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 2000; pointer-events: none; }
   .toast.show { opacity: 1; bottom: 30px; }
 </style>
@@ -156,13 +154,14 @@
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
   
   let allReports = [];
-  let allStaff = []; // Берем отсюда ранги и должности
+  let allStaff = []; 
   let bonusList = [];
 
-     async function loadData() {
+  $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
+
+  async function loadData() {
     $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px;">Загрузка...</div>';
     try {
-      // 1. Загружаем отчеты
       const res = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -171,7 +170,6 @@
       const data = await res.json();
       allReports = data.reports || [];
 
-      // 2. Загружаем базу сотрудников (для рангов и должностей)
       const resStaff = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -183,8 +181,8 @@
       updateCounts();
       renderTable();
     } catch(e) {
-      console.error("Ошибка загрузки:", e);
-      $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка подключения к серверу</div>';
+      console.error(e);
+      $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка сети</div>';
     }
   }
 
@@ -228,7 +226,6 @@
 
     filtered.forEach((r, i) => {
       const isApproved = r.status === 'approved';
-      // Ищем сотрудника в базе staff, чтобы взять его ранг
       const staffInfo = allStaff.find(s => s.name === r.employee_name || s.passport === r.passport) || {};
       const rank = staffInfo.rank || '—';
       const seniority = r.seniority || '0';
@@ -265,9 +262,7 @@
       const rep = allReports.find(x => x.id === id);
       if (rep) rep.seniority = val;
       showToast("Выслуга сохранена");
-    } catch(e) {
-      showToast("Ошибка сохранения");
-    }
+    } catch(e) { showToast("Ошибка"); }
   };
 
   window.openBonusModal = () => {
@@ -289,9 +284,7 @@
   };
 
   window.toggleBonusFromReport = (name) => {
-    if (!bonusList.includes(name)) {
-      bonusList.push(name);
-    }
+    if (!bonusList.includes(name)) bonusList.push(name);
     openBonusModal();
     renderBonusList();
     $("bonusResultBlock").classList.remove("hidden");
@@ -302,16 +295,14 @@
       $("bonusList").innerHTML = '<div style="color:var(--muted);">Список пуст</div>';
       return;
     }
-
     $("bonusList").innerHTML = bonusList.map((name, i) => {
       const r = allReports.find(x => x.employee_name === name) || {};
       const info = allStaff.find(s => s.name === name || s.passport === r.passport) || {};
-      
       return `
         <div class="bonus-item">
           <div>
             <div class="b-name">${name}</div>
-            <div class="b-meta">Паспорт: ${r.passport || '—'} · Ранг: ${info.rank || '—'} · Должность: ${info.position || '—'}</div>
+            <div class="b-meta">Паспорт: ${r.passport || '—'} · Ранг: ${info.rank || '—'}</div>
           </div>
           <button style="background:var(--red-bg); color:#fca5a5; border:1px solid var(--red-border); padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="removeFromBonus(${i})">Убрать</button>
         </div>
@@ -327,44 +318,33 @@
   window.addManualBonus = () => {
     const val = $("bonusAddInput").value.trim().toLowerCase();
     if (!val) return;
-    
     const found = allStaff.find(s => s.name.toLowerCase().includes(val));
     if (found && !bonusList.includes(found.name)) {
       bonusList.push(found.name);
       renderBonusList();
       $("bonusAddInput").value = "";
-    } else {
-      showToast("Сотрудник не найден или уже в списке");
-    }
+    } else { showToast("Не найден"); }
   };
 
-  // КОПИРОВАНИЕ (ТОЧНЫЙ ФОРМАТ)
   window.copyGeneralBonusList = () => {
     if (bonusList.length === 0) return showToast("Список пуст!");
-
     const lines = bonusList.map(name => {
       const report = allReports.find(r => r.employee_name === name) || {};
       const staff = allStaff.find(s => s.name === name || s.passport === report.passport) || {};
-      
-      // Todd West | 189097 | Ранг 17 | Выслуга лет 5
       const passport = report.passport || staff.passport || "—";
       const rank = staff.rank ? `Ранг ${staff.rank}` : "Ранг —";
       const seniority = report.seniority || "0";
-
       return `${name} | ${passport} | ${rank} | Выслуга лет ${seniority}`;
     });
-
     const finalText = "```\n" + lines.join("\n") + "\n```";
-    
     navigator.clipboard.writeText(finalText).then(() => {
       showToast("✅ Списки скопированы!");
-      closeBonusModal(); // Закрываем модалку
-    }).catch(() => {
-      showToast("Ошибка копирования");
+      closeBonusModal();
     });
   };
 
-    window.deleteReport = async (id) => {
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ (БЕЗ CONFIRM)
+  window.deleteReport = async (id) => {
     try {
       await fetch(WORKER_URL, { 
         method: "POST", 
@@ -374,11 +354,10 @@
       showToast("✅ Сотрудник удалён");
       loadData();
     } catch(e) {
-      showToast("❌ Ошибка при удалении");
+      showToast("❌ Ошибка удаления");
     }
   };
 
-  // Уведомление вместо showToast
   function showToast(msg) {
     const t = $("toastMsg");
     t.textContent = msg;
