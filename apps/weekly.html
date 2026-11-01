@@ -51,7 +51,6 @@
     cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
   }
 
-  /* Стили для поля ввода выслуги */
   .seniority-input {
     width: 60px; padding: 4px 8px; text-align: center;
     background: var(--input-bg); border: 1px solid var(--border);
@@ -67,6 +66,10 @@
   .bonus-item .b-meta { font-size: 0.75rem; color: var(--muted); }
   .btn-copy-bonus { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 14px; background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a1207; font-size: 1rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; margin-top: 15px; }
   .hidden { display: none !important; }
+
+  /* Тост об успехе */
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2f9e44; color: white; padding: 12px 24px; border-radius: 8px; font-weight: bold; opacity: 0; transition: 0.3s; z-index: 2000; pointer-events: none; }
+  .toast.show { opacity: 1; bottom: 30px; }
 </style>
 </head>
 <body>
@@ -146,12 +149,14 @@
   </div>
 </div>
 
+<div class="toast" id="toastMsg">✅ Скопировано!</div>
+
 <script>
   const $ = (id) => document.getElementById(id);
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
   
   let allReports = [];
-  let allStaff = []; 
+  let allStaff = []; // Берем отсюда ранги и должности
   let bonusList = [];
 
   $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
@@ -159,6 +164,7 @@
   async function loadData() {
     $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px;">Загрузка...</div>';
     try {
+      // Загружаем отчеты
       const res = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -167,17 +173,19 @@
       const data = await res.json();
       allReports = data.reports || [];
       
+      // Загружаем базу Персонала (там есть ранги и должности)
       const resStaff = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getUsers" })
+        body: JSON.stringify({ action: "getStaff" }) // <--- БЕРЕМ ИЗ STAFF
       });
       const dataStaff = await resStaff.json();
-      allStaff = dataStaff.users || [];
+      allStaff = dataStaff.staff || [];
 
       updateCounts();
       renderTable();
     } catch(e) {
+      console.error(e);
       $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка сети</div>';
     }
   }
@@ -222,9 +230,10 @@
 
     filtered.forEach((r, i) => {
       const isApproved = r.status === 'approved';
-      const staffInfo = allStaff.find(s => s.login === r.employee_name || s.login === r.name) || {};
+      // Ищем сотрудника в базе staff, чтобы взять его ранг
+      const staffInfo = allStaff.find(s => s.name === r.employee_name || s.passport === r.passport) || {};
       const rank = staffInfo.rank || '—';
-      const seniority = r.seniority || '0'; // Берем из отчета, если нет - 0
+      const seniority = r.seniority || '0';
 
       html += `
         <tr>
@@ -248,7 +257,6 @@
     $("tableContainer").innerHTML = html;
   }
 
-  // Сохранение выслуги лет
   window.updateSeniority = async (id, val) => {
     try {
       await fetch(WORKER_URL, {
@@ -256,11 +264,11 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "updateSeniority", id: id, seniority: val })
       });
-      // Обновляем локально, чтобы не перезагружать таблицу
       const rep = allReports.find(x => x.id === id);
       if (rep) rep.seniority = val;
+      showToast("Выслуга сохранена");
     } catch(e) {
-      alert("Ошибка сохранения выслуги");
+      alert("Ошибка сохранения");
     }
   };
 
@@ -298,14 +306,14 @@
     }
 
     $("bonusList").innerHTML = bonusList.map((name, i) => {
-      const info = allStaff.find(s => s.login === name) || {};
       const r = allReports.find(x => x.employee_name === name) || {};
+      const info = allStaff.find(s => s.name === name || s.passport === r.passport) || {};
       
       return `
         <div class="bonus-item">
           <div>
             <div class="b-name">${name}</div>
-            <div class="b-meta">Паспорт: ${r.passport || '—'} · Ранг: ${info.rank || '—'}</div>
+            <div class="b-meta">Паспорт: ${r.passport || '—'} · Ранг: ${info.rank || '—'} · Должность: ${info.position || '—'}</div>
           </div>
           <button style="background:var(--red-bg); color:#fca5a5; border:1px solid var(--red-border); padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="removeFromBonus(${i})">Убрать</button>
         </div>
@@ -322,9 +330,9 @@
     const val = $("bonusAddInput").value.trim().toLowerCase();
     if (!val) return;
     
-    const found = allStaff.find(s => s.login.toLowerCase().includes(val));
-    if (found && !bonusList.includes(found.login)) {
-      bonusList.push(found.login);
+    const found = allStaff.find(s => s.name.toLowerCase().includes(val));
+    if (found && !bonusList.includes(found.name)) {
+      bonusList.push(found.name);
       renderBonusList();
       $("bonusAddInput").value = "";
     } else {
@@ -332,15 +340,15 @@
     }
   };
 
-  // КОПИРОВАНИЕ В ТОЧНОМ ФОРМАТЕ
+  // КОПИРОВАНИЕ (ТОЧНЫЙ ФОРМАТ)
   window.copyGeneralBonusList = () => {
     if (bonusList.length === 0) return alert("Список пуст!");
 
     const lines = bonusList.map(name => {
-      const staff = allStaff.find(s => s.login === name) || {};
       const report = allReports.find(r => r.employee_name === name) || {};
+      const staff = allStaff.find(s => s.name === name || s.passport === report.passport) || {};
       
-      // Формат: Todd West | 189097 | Ранг 17 | Выслуга лет 5
+      // Todd West | 189097 | Ранг 17 | Выслуга лет 5
       const passport = report.passport || staff.passport || "—";
       const rank = staff.rank ? `Ранг ${staff.rank}` : "Ранг —";
       const seniority = report.seniority || "0";
@@ -351,7 +359,8 @@
     const finalText = "```\n" + lines.join("\n") + "\n```";
     
     navigator.clipboard.writeText(finalText).then(() => {
-      alert("✅ Списки скопированы!\n\n" + finalText);
+      showToast("✅ Списки скопированы!");
+      closeBonusModal(); // Закрываем модалку
     }).catch(() => {
       alert("Ошибка копирования");
     });
@@ -362,6 +371,14 @@
     await fetch(WORKER_URL, { method: "POST", body: JSON.stringify({ action: "deleteReport", id }) });
     loadData();
   };
+
+  // Уведомление вместо alert
+  function showToast(msg) {
+    const t = $("toastMsg");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
 
   $("searchInput").addEventListener("input", renderTable);
   $("filterStatus").addEventListener("change", renderTable);
