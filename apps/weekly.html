@@ -173,12 +173,23 @@
       const data = await res.json();
       allReports = data.reports || [];
       
-      // Загружаем базу Персонала (там есть ранги и должности)
-      const resStaff = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getStaff" }) // <--- БЕРЕМ ИЗ STAFF
-      });
+            // Загружаем базу Персонала (там есть ранги и должности)
+      let allStaffData = [];
+      try {
+        const resStaff = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "getStaff" })
+        });
+        const dataStaff = await resStaff.json();
+        if (dataStaff.success) {
+          allStaffData = dataStaff.staff || [];
+        }
+      } catch(err) {
+        console.warn("Не удалось загрузить staff", err);
+      }
+      
+      allStaff = allStaffData;
       const dataStaff = await resStaff.json();
       allStaff = dataStaff.staff || [];
 
