@@ -159,32 +159,32 @@
   let allStaff = []; // Берем отсюда ранги и должности
   let bonusList = [];
 
-  $("backBtn").addEventListener("click", () => window.parent.postMessage({ action: "goBack" }, "*"));
-
-   async function loadData() {
+     async function loadData() {
     $("tableContainer").innerHTML = '<div style="text-align:center; padding:20px;">Загрузка...</div>';
     try {
+      // 1. Загружаем отчеты
       const res = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "getReports" })
       });
       const data = await res.json();
-      
-      if (data.success) {
-        allReports = data.reports || [];
-      } else {
-        allReports = [];
-      }
+      allReports = data.reports || [];
 
-      // ВРЕМЕННО ОТКЛЮЧАЕМ ЗАГРУЗКУ STAFF, чтобы не было ошибки сети
-      allStaff = []; 
+      // 2. Загружаем базу сотрудников (для рангов и должностей)
+      const resStaff = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "getStaff" })
+      });
+      const dataStaff = await resStaff.json();
+      allStaff = dataStaff.staff || [];
 
       updateCounts();
       renderTable();
     } catch(e) {
       console.error("Ошибка загрузки:", e);
-      $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка подключения к серверу (Worker)</div>';
+      $("tableContainer").innerHTML = '<div style="color:red; text-align:center;">Ошибка подключения к серверу</div>';
     }
   }
 
