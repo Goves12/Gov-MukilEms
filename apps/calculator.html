@@ -207,13 +207,13 @@
       } else {
         showToast("❌ Ошибка: " + data.message, "red");
       }
-    } catch(e) {
+        } catch(e) {
       showToast("❌ Ошибка сети! Проверь соединение.", "red");
     } finally {
       btn.textContent = "Отправить в Недельный отчет";
       btn.disabled = false;
     }
-  });
+  }); // <--- ЗДЕСЬ ЗАКРЫВАЕТСЯ КНОПКА ОТПРАВКИ
 
   // 3. Сброс
   $("resetBtn").addEventListener("click", () => {
@@ -223,7 +223,7 @@
     $("reportArea").value = "";
   });
 
-  // Плашка вместо alert
+  // Функция плашки
   function showToast(message, color = "green") {
     const toast = document.createElement("div");
     toast.textContent = message;

@@ -276,7 +276,7 @@
           $("appIframe").src = "apps/calculator.html"; 
         }
         else {
-          alert("Раздел в разработке");
+          showToast("Раздел в разработке");
         }
       });
           
@@ -355,7 +355,7 @@
 
       $("forcePasswordModal").classList.add("hidden");
       showDesk(session);
-      alert("Пароль успешно изменен!");
+      showToast("Пароль успешно изменен!");
     } catch (err) {
       notify($("fpNotification"), "Ошибка сети", "error");
     } finally {

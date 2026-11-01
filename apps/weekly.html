@@ -266,7 +266,7 @@
       if (rep) rep.seniority = val;
       showToast("Выслуга сохранена");
     } catch(e) {
-      alert("Ошибка сохранения");
+      showToast("Ошибка сохранения");
     }
   };
 
@@ -334,13 +334,13 @@
       renderBonusList();
       $("bonusAddInput").value = "";
     } else {
-      alert("Сотрудник не найден или уже в списке");
+      showToast("Сотрудник не найден или уже в списке");
     }
   };
 
   // КОПИРОВАНИЕ (ТОЧНЫЙ ФОРМАТ)
   window.copyGeneralBonusList = () => {
-    if (bonusList.length === 0) return alert("Список пуст!");
+    if (bonusList.length === 0) return showToast("Список пуст!");
 
     const lines = bonusList.map(name => {
       const report = allReports.find(r => r.employee_name === name) || {};
@@ -360,7 +360,7 @@
       showToast("✅ Списки скопированы!");
       closeBonusModal(); // Закрываем модалку
     }).catch(() => {
-      alert("Ошибка копирования");
+      showToast("Ошибка копирования");
     });
   };
 
@@ -370,7 +370,7 @@
     loadData();
   };
 
-  // Уведомление вместо alert
+  // Уведомление вместо showToast
   function showToast(msg) {
     const t = $("toastMsg");
     t.textContent = msg;

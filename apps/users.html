@@ -157,8 +157,8 @@
     const role = $("newUserRole").value;
     const department = "МинЗдрав"; // Всегда отправляем только МинЗдрав
 
-    if (!login) return alert("Введите логин");
-    if (!editLogin && !pass) return alert("Введите пароль");
+    if (!login) return showToast("Введите логин");
+    if (!editLogin && !pass) return showToast("Введите пароль");
 
     const btn = $("saveUserBtn");
     btn.disabled = true; btn.textContent = "Отправка...";
@@ -184,10 +184,10 @@
         $("userFormBlock").classList.add("hidden");
         loadUsers();
       } else {
-        alert("Ошибка сохранения: " + data.message);
+        showToast("Ошибка сохранения: " + data.message);
       }
     } catch (e) {
-      alert("Ошибка сети!");
+      showToast("Ошибка сети!");
     } finally {
       btn.disabled = false; btn.textContent = "Сохранить";
     }
@@ -213,7 +213,7 @@
   };
 
   window.deleteUser = (login) => {
-    if (login === 'todd') return alert("Нельзя удалить главного администратора!");
+    if (login === 'todd') return showToast("Нельзя удалить главного администратора!");
     if (!confirm(`Удалить пользователя ${login}?`)) return;
     
     fetch(WORKER_URL, {
