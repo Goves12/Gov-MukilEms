@@ -347,7 +347,6 @@
           return showToast(`❌ ${data.message}`, "red");
         }
 
-        // Достаем текст из правильного места
         const aiText = data.rawResponse && data.rawResponse.response ? data.rawResponse.response : "";
         if (!aiText) {
           return showToast("❌ ИИ ничего не ответил", "red");
@@ -387,6 +386,17 @@
 
           if (!name || !passport) continue;
 
+          // ПРОВЕРКА НА ДУБЛИКАТЫ
+          const isDuplicate = allStaff.find(s => 
+            s.name.toLowerCase().trim() === name.toLowerCase().trim() || 
+            s.passport === passport
+          );
+
+          if (isDuplicate) {
+            console.log(`Пропущен дубликат: ${name}`);
+            continue;
+          }
+
           await fetch(WORKER_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -400,7 +410,7 @@
             })
           });
           addedCount++;
-        }
+        } // <--- ЗДЕСЬ БЫЛА ПОТЕРЯНА СКОБКА
 
         if (addedCount > 0) {
           showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
