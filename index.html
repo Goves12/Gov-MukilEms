@@ -266,6 +266,15 @@
           $("currentAppTitle").textContent = a.label; 
           $("appIframe").src = `apps/about.html?user=${session.login}&role=${session.role}`; 
         }
+        else if (a.id === 'staff') {
+          $("authScreen").classList.add("hidden"); 
+          $("deskScreen").classList.add("hidden");
+          $("appFrame").classList.remove("hidden");
+          $("appHeader").classList.remove("hidden"); 
+          $("currentAppTitle").textContent = a.label; 
+          // Передаем роль в URL, чтобы страница знала, можно ли показывать кнопки
+          $("appIframe").src = `apps/staff.html?role=${session.role}&v=${Date.now()}`; 
+        }
         else if (a.id === 'calc') {
           // Открываем калькулятор в iframe!
           $("authScreen").classList.add("hidden"); 
