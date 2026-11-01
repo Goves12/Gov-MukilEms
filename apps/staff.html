@@ -318,17 +318,16 @@
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-   // Обработка фото для ИИ
+     // Обработка фото для ИИ
   async function handleAIImage(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Проверка размера файла (не больше 4 МБ)
     if (file.size > 4 * 1024 * 1024) {
-      return showToast("❌ Картинка слишком большая (макс 4 МБ). Сожмите или обрежьте её.", "red");
+      return showToast("❌ Картинка слишком большая (макс 4 МБ). Сожмите её.", "red");
     }
 
-    showToast("🤖 ИИ анализирует фото...", "blue");
+    showToast("🤖 ИИ читает таблицу...", "blue");
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -342,35 +341,62 @@
         });
         
         const data = await res.json();
-        console.log("Ответ от ИИ:", data); // Смотрим в F12
+        
+        if (!data.success) {
+          return showToast(`❌ ${data.message}`, "red");
+        }
 
-        if (data.success && data.staff && data.staff.length > 0) {
-          let addedCount = 0;
-          for (const person of data.staff) {
-            let finalRank = person.rank ? String(person.rank).replace(/\D/g, '') : "1";
-            if (person.rank === "Leader") finalRank = "28";
-            if (!finalRank || finalRank === "0") finalRank = "1";
+        if (!data.rawText) {
+          return showToast("❌ ИИ ничего не ответил", "red");
+        }
 
-            await fetch(WORKER_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                action: "addStaff", 
-                name: person.name || "Неизвестный", 
-                passport: person.passport || "00000", 
-                position: person.position || "Сотрудник", 
-                rank: finalRank, 
-                department: "МинЗдрав"
-              })
-            });
-            addedCount++;
-          }
+        console.log("Сырой текст от ИИ:", data.rawText);
+
+        // РАЗБИРАЕМ ТЕКСТ
+        const lines = data.rawText.split('\n');
+        let addedCount = 0;
+
+        for (let line of lines) {
+          line = line.trim();
+          // Ищем строки, где есть разделитель |
+          if (!line.includes('|')) continue;
+          
+          const parts = line.split('|').map(p => p.trim());
+          if (parts.length < 4) continue;
+
+          const name = parts[0];
+          const passport = parts[1].replace(/\D/g, ''); // Оставляем только цифры
+          const position = parts[2];
+          let rank = parts[3].replace(/\D/g, ''); // Оставляем только цифры
+
+          // Если ранг пустой, ставим 1
+          if (!rank) rank = "1";
+          // Если паспорт пустой, пропускаем
+          if (!passport) continue;
+
+          // Отправляем на сервер
+          await fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              action: "addStaff", 
+              name: name, 
+              passport: passport, 
+              position: position, 
+              rank: rank, 
+              department: "МинЗдрав"
+            })
+          });
+          addedCount++;
+        }
+
+        if (addedCount > 0) {
           showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
           loadStaff();
         } else {
-          // Показываем ошибку от сервера
-          showToast(`❌ ${data.message}`, "red");
+          showToast("❌ ИИ не смог распознать данные. Попробуйте обрезать фото.", "red");
         }
+
       } catch (err) {
         console.error(err);
         showToast("❌ Ошибка при работе ИИ", "red");
