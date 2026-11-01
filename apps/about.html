@@ -37,7 +37,6 @@
   .devlog-list { display: flex; flex-direction: column; gap: 15px; }
   .devlog-item { background: var(--panel-2); border-left: 4px solid var(--blue); padding: 15px; border-radius: 8px; position: relative; }
   
-  /* Исправленная шапка Devlog (чтобы дата не налезала на крестик) */
   .devlog-meta { 
     display: flex; 
     justify-content: flex-start; 
@@ -47,19 +46,17 @@
     margin-bottom: 10px; 
     padding-bottom: 5px; 
     border-bottom: 1px solid rgba(255,255,255,0.05); 
-    padding-right: 35px; /* Отступ справа для кнопки удаления */
+    padding-right: 35px;
   }
   .devlog-author { font-weight: bold; color: var(--accent); }
   .devlog-text { font-size: 0.9rem; line-height: 1.6; }
   
-  /* Оформление текста внутри Devlog */
   .devlog-text b { color: #fff; font-size: 0.95rem; display: block; margin-top: 10px; margin-bottom: 5px; }
   .devlog-text ul { margin-left: 15px; margin-bottom: 10px; }
   .devlog-text li { margin-bottom: 4px; color: #d1d9e6; }
   .devlog-text li::marker { color: var(--accent); }
   .devlog-text br { line-height: 1.5; }
 
-  /* Кнопка удаления */
   .btn-del-devlog { 
     position: absolute; 
     top: 10px; 
@@ -92,7 +89,6 @@
 <body>
 
 <div class="wrap">
-  <!-- Оформление -->
   <div class="card">
     <h3>Оформление</h3>
     <div class="theme-switcher">
@@ -101,7 +97,6 @@
     </div>
   </div>
 
-  <!-- Состояние -->
   <div class="card">
     <h3>Состояние соединения</h3>
     <div class="row"><span>Версия планшета</span><span>1.4</span></div>
@@ -110,7 +105,6 @@
     <div class="row"><span>Роль</span><span id="aboutRole">—</span></div>
   </div>
 
-  <!-- Уведомления -->
   <div class="card">
     <h3>Уведомления</h3>
     <div class="toggle-row">
@@ -129,14 +123,12 @@
     </div>
   </div>
 
-  <!-- Devlog -->
   <div class="card">
     <h3>📝 Devlog — журнал изменений</h3>
     <div class="devlog-list" id="devlogList">
       <div style="text-align:center; padding:20px; color:var(--muted);">Загрузка...</div>
     </div>
 
-    <!-- Форма добавления (для админов) -->
     <div class="add-form hidden" id="addForm">
       <input type="text" id="newDevlogText" placeholder="**Заголовок** • Пункт 1 • Пункт 2">
       <button class="btn-add" onclick="addDevlog()">Добавить</button>
@@ -207,7 +199,6 @@
     const canDelete = ['Бог', 'Министр здравоохранения'].includes(userRole);
 
     $("devlogList").innerHTML = entries.map(e => {
-      // КРАСИВЫЙ ФОРМАТ ДАТЫ
       const dateObj = new Date(e.created_at);
       const dateStr = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
       const timeStr = dateObj.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -217,7 +208,6 @@
                       dateObj.getFullYear() === today.getFullYear();
       const displayDate = isToday ? `Сегодня, ${timeStr}` : `${dateStr}, ${timeStr}`;
       
-      // ПАРСЕР ТЕКСТА
       let formatted = e.text
         .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
         .replace(/ • /g, '</li><li>')
@@ -260,15 +250,15 @@
     }
   };
 
+  // УДАЛЕНИЕ БЕЗ ОКОН CONFIRM
   window.deleteDevlog = async (id) => {
-    if (!confirm("Удалить эту запись из журнала?")) return;
     try {
       await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "deleteDevlog", id: id })
       });
-      showToast("Запись удалена");
+      showToast("🗑️ Запись удалена");
       loadDevlog();
     } catch(e) {
       showToast("Ошибка удаления", "red");
