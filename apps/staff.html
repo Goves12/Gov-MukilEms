@@ -115,8 +115,9 @@
   </div>
 
   <div class="card hidden" id="formBlock">
+    <input type="hidden" id="editStaffId">
     <div class="card-head">
-      <h3 style="font-size:1.05rem; margin:0;">Новый сотрудник</h3>
+      <h3 id="formTitle" style="font-size:1.05rem; margin:0;">Новый сотрудник</h3>
       <button class="btn-back" onclick="toggleForm()">Отмена</button>
     </div>
 
@@ -147,7 +148,7 @@
       </div>
     </div>
 
-    <button class="btn-submit" onclick="addStaff()">Добавить сотрудника</button>
+    <button class="btn-submit" id="submitBtn" onclick="saveStaff()">Добавить сотрудника</button>
   </div>
 </div>
 
@@ -194,7 +195,16 @@
   }
 
   function toggleForm() {
-    $("formBlock").classList.toggle("hidden");
+    const block = $("formBlock");
+    block.classList.toggle("hidden");
+    
+    // Если форму закрывают или открывают для нового, сбрасываем поля
+    if (block.classList.contains("hidden") || !$("editStaffId").value) {
+      $("editStaffId").value = "";
+      $("newName").value = ""; $("newPassport").value = ""; $("newPosition").value = "";
+      $("formTitle").textContent = "Новый сотрудник";
+      $("submitBtn").textContent = "Добавить сотрудника";
+    }
   }
 
   async function loadStaff() {
@@ -267,6 +277,8 @@
           
           ${canEdit ? `
             <td style="text-align:right; white-space:nowrap;">
+              <button class="action-btn" title="Изменить" onclick="editStaff(${s.id})" style="color:#93c5fd;">✏️</button>
+              
               ${currentTab === 'active' 
                 ? `<button class="action-btn" title="Уволить" onclick="fireStaff(${s.id})" style="color:#fca5a5;">✖</button>`
                 : `<button class="action-btn" title="Восстановить" onclick="restoreStaff(${s.id})" style="color:#86efac;">↺</button>
@@ -313,7 +325,26 @@
     }
   };
 
-  window.addStaff = async () => {
+  // ОТКРЫТИЕ ФОРМЫ ДЛЯ РЕДАКТИРОВАНИЯ
+  window.editStaff = (id) => {
+    const s = allStaff.find(x => x.id === id);
+    if (!s) return;
+
+    $("editStaffId").value = s.id;
+    $("newName").value = s.name;
+    $("newPassport").value = s.passport || "";
+    $("newPosition").value = s.position || "";
+    $("newRank").value = s.rank || "1";
+    $("newDepartment").value = s.department || "МинЗдрав";
+
+    $("formTitle").textContent = "Редактировать: " + s.name;
+    $("submitBtn").textContent = "Сохранить изменения";
+    $("formBlock").classList.remove("hidden");
+  };
+
+  // СОХРАНЕНИЕ (СОЗДАНИЕ ИЛИ ОБНОВЛЕНИЕ)
+  window.saveStaff = async () => {
+    const id = $("editStaffId").value;
     const name = $("newName").value.trim();
     const passport = $("newPassport").value.trim();
     const position = $("newPosition").value.trim();
@@ -322,13 +353,20 @@
 
     if (!name || !passport) return showToast("Введите имя и паспорт", "red");
 
+    const action = id ? "updateStaff" : "addStaff";
+    const payload = { action, name, passport, position, rank, department };
+    if (id) payload.id = parseInt(id);
+
     try {
       await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "addStaff", name, passport, position, rank, department })
+        body: JSON.stringify(payload)
       });
-      showToast("✅ Сотрудник добавлен");
+      showToast(id ? "✅ Изменения сохранены" : "✅ Сотрудник добавлен");
+      
+      // Очищаем форму и прячем её
+      $("editStaffId").value = "";
       $("newName").value = ""; $("newPassport").value = ""; $("newPosition").value = "";
       toggleForm();
       loadStaff();
