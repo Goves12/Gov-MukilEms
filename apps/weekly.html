@@ -364,10 +364,18 @@
     });
   };
 
-  window.deleteReport = async (id) => {
-    if (!confirm("Удалить?")) return;
-    await fetch(WORKER_URL, { method: "POST", body: JSON.stringify({ action: "deleteReport", id }) });
-    loadData();
+    window.deleteReport = async (id) => {
+    try {
+      await fetch(WORKER_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deleteReport", id }) 
+      });
+      showToast("✅ Сотрудник удалён");
+      loadData();
+    } catch(e) {
+      showToast("❌ Ошибка при удалении");
+    }
   };
 
   // Уведомление вместо showToast
