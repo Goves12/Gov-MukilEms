@@ -40,7 +40,7 @@
   .auth-card h1 { text-align: center; font-size: 1.3rem; margin-bottom: 4px; }
   .auth-card p { text-align: center; color: var(--muted); font-size: 0.84rem; margin-bottom: 24px; }
   
-  .btn-discord { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: var(--discord); color: #fff; border-radius: 12px; font-weight: 700; text-decoration: none; margin-bottom: 14px; }
+  .btn-discord { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: var(--discord); color: #fff; border-radius: 12px; font-weight: 700; text-decoration: none; margin-bottom: 14px; cursor: pointer; }
   .btn-discord svg { width: 24px; height: 24px; fill: currentColor; }
   .divider { text-align: center; color: var(--muted); font-size: 0.72rem; margin-bottom: 14px; }
   
@@ -133,10 +133,8 @@
       <div class="app-grid" id="appGrid"></div>
     </div>
 
-                <!-- УНИВЕРСАЛЬНЫЙ ЭКРАН ДЛЯ ПРИЛОЖЕНИЙ -->
+    <!-- УНИВЕРСАЛЬНЫЙ ЭКРАН ДЛЯ ПРИЛОЖЕНИЙ -->
     <div class="app-screen hidden" id="appFrame">
-      
-      <!-- Шапка раздела с кнопкой Назад -->
       <div id="appHeader" style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
         <button class="btn-small" id="backToDeskBtn" style="display:flex; align-items:center; gap:6px; padding:8px 12px; font-weight:600; background:var(--panel-2); border:1px solid var(--border); cursor:pointer; color:white;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -149,6 +147,8 @@
         <iframe id="appIframe" src="about:blank" style="width:100%; height:100%; border:none;"></iframe>
       </div>
     </div>
+  </div>
+</div>
 
 <!-- МОДАЛКА СМЕНЫ ПАРОЛЯ -->
 <div class="modal-back hidden" id="forcePasswordModal">
@@ -163,11 +163,11 @@
     </form>
   </div>
 </div>
+
 <script>
 (function () {
   "use strict";
 
-  // ВСТАВЬ СЮДА СВОЙ АДРЕС WORKER (без слэша на конце)
   const WORKER_URL = "https://goverment.vadrgnuil.workers.dev"; 
   const SESSION_KEY = "hospital_session_v3";
 
@@ -179,7 +179,6 @@
     setTimeout(() => el.classList.remove("show"), 4000);
   }
 
-  // Хэширование пароля перед отправкой (чтобы в открытом виде не летело)
   async function sha256Hex(text) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
@@ -203,16 +202,16 @@
   function showAuth() {
     $("authScreen").classList.remove("hidden");
     $("deskScreen").classList.add("hidden");
-    $("usersScreen").classList.add("hidden");
+    $("appFrame").classList.add("hidden");
     $("userChip").classList.remove("visible");
     $("statusUserBlock").classList.add("hidden");
     $("loginForm").reset();
   }
 
-    function showDesk(session) {
+  function showDesk(session) {
     $("authScreen").classList.add("hidden");
     $("deskScreen").classList.remove("hidden");
-    $("appFrame").classList.add("hidden"); // Скрываем iframe
+    $("appFrame").classList.add("hidden");
     $("userChip").classList.add("visible");
     $("userName").textContent = session.login;
     
@@ -230,7 +229,6 @@
     $("greetingTitle").textContent = "Добро пожаловать, " + session.login;
     $("greetingSub").textContent = "Роль: " + session.role;
 
-    // Рисуем плитки
     const grid = $("appGrid");
     grid.innerHTML = "";
     
@@ -241,7 +239,7 @@
       tile.className = "app-tile";
       tile.innerHTML = `<div class="app-icon ${a.color}">${a.icon}</div><div class="label">${a.label}</div><div class="sub">${a.sub}</div>`;
       
-            tile.addEventListener("click", () => {
+      tile.addEventListener("click", () => {
         if (a.id === 'users') {
           $("authScreen").classList.add("hidden"); 
           $("deskScreen").classList.add("hidden");
@@ -264,7 +262,7 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          $("appIframe").src = `apps/about.html?user=${session.login}&role=${session.role}`; 
+          $("appIframe").src = `apps/about.html?user=${session.login}&role=${session.role}&v=${Date.now()}`; 
         }
         else if (a.id === 'staff') {
           $("authScreen").classList.add("hidden"); 
@@ -272,11 +270,9 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          // Передаем роль в URL, чтобы страница знала, можно ли показывать кнопки
           $("appIframe").src = `apps/staff.html?role=${session.role}&v=${Date.now()}`; 
         }
         else if (a.id === 'calc') {
-          // Открываем калькулятор в iframe!
           $("authScreen").classList.add("hidden"); 
           $("deskScreen").classList.add("hidden");
           $("appFrame").classList.remove("hidden");
@@ -284,16 +280,13 @@
           $("currentAppTitle").textContent = a.label; 
           $("appIframe").src = "apps/calculator.html?v=" + Date.now(); 
         }
-        else {
-          showToast("Раздел в разработке");
-        }
       });
           
       grid.appendChild(tile);
     });
   }
 
-  // --- ВХОД (СТУЧИМСЯ В CLOUDFLARE) ---
+  // --- ВХОД ПО ЛОГИНУ ---
   $("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const login = $("loginInput").value.trim().toLowerCase();
@@ -304,7 +297,6 @@
 
     try {
       const hash = await sha256Hex(pass);
-      
       const res = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -312,17 +304,14 @@
       });
       
       const data = await res.json();
-      console.log("Ответ от сервера:", data); // Покажет ответ в консоли F12
 
       if (!data.success) {
         notify($("loginNotification"), data.message || "Неверный логин или пароль", "error");
         return;
       }
 
-      // Сохраняем сессию (добавили отдел)
       saveSession({ login: data.login, role: data.role, department: data.department || "МинЗдрав", ts: Date.now() });
 
-      // Если пароль временный (isTemp = true), кидаем на смену
       if (data.isTemp) {
         $("authScreen").classList.add("hidden");
         $("forcePasswordModal").classList.remove("hidden");
@@ -330,14 +319,20 @@
         showDesk(data);
       }
     } catch (err) {
-      console.error(err);
       notify($("loginNotification"), "Ошибка сети. Сервер не отвечает.", "error");
     } finally {
       btn.disabled = false; btn.textContent = "Войти по логину";
     }
   });
 
-  // --- СМЕНА ПАРОЛЯ (ОТПРАВЛЯЕМ В CLOUDFLARE) ---
+  // --- КНОПКА DISCORD ---
+  $("discordLoginBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    const redirectUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+    window.location.href = `${WORKER_URL}/auth/discord?redirect=${redirectUrl}`;
+  });
+
+  // --- СМЕНА ПАРОЛЯ ---
   $("forcePasswordForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const p1 = $("fpNew1").value;
@@ -391,32 +386,40 @@
     });
   }
 
-    // --- КНОПКИ ---
-  $("discordLoginBtn").addEventListener("click", (e) => e.preventDefault());
-  
-    $("logoutBtn").addEventListener("click", () => {
+  $("logoutBtn").addEventListener("click", () => {
     clearSession();
-    
-    // Принудительно скрываем и очищаем приложения
     $("appFrame").classList.add("hidden");
     $("appHeader").classList.add("hidden");
     $("appIframe").src = "about:blank"; 
-    
-    showAuth(); // Показываем экран входа
+    showAuth();
   });
 
-   $("backToDeskBtn").addEventListener("click", () => {
+  $("backToDeskBtn").addEventListener("click", () => {
     $("appFrame").classList.add("hidden");
-    $("deskScreen").classList.remove("hidden"); // <--- Показываем рабочий стол
-    $("appIframe").src = "about:blank"; // Очищаем iframe
+    $("deskScreen").classList.remove("hidden");
+    $("appIframe").src = "about:blank";
   });
 
-  // --- СТАРТ ---
-  const session = loadSession();
-  if (session) {
+  // --- ПРОВЕРКА URL (ВОЗВРАТ ОТ DISCORD) ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlLogin = urlParams.get('login');
+  const urlRole = urlParams.get('role');
+  const urlDept = urlParams.get('dept') || 'МинЗдрав';
+
+  if (urlLogin && urlRole) {
+    // Пользователь вернулся с Discord
+    const session = { login: urlLogin, role: urlRole, department: urlDept, ts: Date.now() };
+    saveSession(session);
+    window.history.replaceState({}, document.title, window.location.pathname);
     showDesk(session);
   } else {
-    showAuth();
+    // Обычный запуск
+    const session = loadSession();
+    if (session) {
+      showDesk(session);
+    } else {
+      showAuth();
+    }
   }
 
 })();
