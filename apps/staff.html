@@ -27,7 +27,7 @@
   .btn-add { background: #06b6d4; color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
   
   .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
   .filter-bar input { flex: 1; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; color: white; outline: none; }
@@ -77,15 +77,22 @@
     </button>
   </div>
 
-          <input type="file" id="aiFileInput" accept="image/*" style="display: none;" onchange="handleAIImage(event)">
+  <div class="card">
+    <div class="card-head">
+      <h3 style="font-size:1.1rem; margin:0;">Список сотрудников</h3>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <input type="file" id="aiFileInput" accept="image/*" style="display: none;" onchange="handleAIImage(event)">
+        
         <button class="btn-purple" onclick="document.getElementById('aiFileInput').click()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           ИИ-Импорт
         </button>
+        
         <button class="btn-outline" onclick="showToast('Функция в разработке', 'red')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Импорт / экспорт
         </button>
+        
         <button class="btn-add" id="addBtn" onclick="toggleForm()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Добавить
@@ -264,7 +271,6 @@
     `;
 
     filtered.forEach((s, i) => {
-      // Расшифровка ранга для таблицы
       const rankObj = RANKS.find(r => r.id == s.rank);
       const rankName = rankObj ? rankObj.name : s.rank;
 
@@ -300,57 +306,6 @@
     } catch(e) { showToast("Ошибка", "red"); }
   };
 
-    // Обработка фото для ИИ
-  async function handleAIImage(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // Показываем, что идет загрузка
-    showToast("🤖 ИИ анализирует фото... Подождите", "blue");
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64Image = e.target.result;
-
-      try {
-        const res = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "aiImportStaff", image: base64Image })
-        });
-        const data = await res.json();
-
-        if (data.success && data.staff && data.staff.length > 0) {
-          // Если ИИ распознал людей, добавляем их в базу
-          let addedCount = 0;
-          for (const person of data.staff) {
-            await fetch(WORKER_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                action: "addStaff", 
-                name: person.name, 
-                passport: person.passport, 
-                position: person.position || "Не указано", 
-                rank: person.rank || "1", 
-                department: "МинЗдрав" 
-              })
-            });
-            addedCount++;
-          }
-          showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
-          loadStaff(); // Обновляем таблицу
-        } else {
-          showToast("❌ ИИ не смог найти сотрудников на фото", "red");
-        }
-      } catch (err) {
-        showToast("❌ Ошибка при работе ИИ", "red");
-      }
-    };
-    reader.readAsDataURL(file);
-    event.target.value = ""; // Очищаем инпут, чтобы можно было загрузить новое фото
-  }
-
   window.restoreStaff = async (id) => {
     try {
       await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "restoreStaff", id }) });
@@ -380,6 +335,55 @@
       loadStaff();
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
+
+  // Обработка фото для ИИ
+  async function handleAIImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    showToast("🤖 ИИ анализирует фото... Подождите", "blue");
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Image = e.target.result;
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "aiImportStaff", image: base64Image })
+        });
+        const data = await res.json();
+
+        if (data.success && data.staff && data.staff.length > 0) {
+          let addedCount = 0;
+          for (const person of data.staff) {
+            await fetch(WORKER_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                action: "addStaff", 
+                name: person.name, 
+                passport: person.passport, 
+                position: person.position || "Не указано", 
+                rank: person.rank || "1", 
+                department: "МинЗдрав" 
+              })
+            });
+            addedCount++;
+          }
+          showToast(`✅ ИИ добавил ${addedCount} сотрудников!`, "green");
+          loadStaff();
+        } else {
+          showToast("❌ ИИ не смог найти сотрудников на фото", "red");
+        }
+      } catch (err) {
+        showToast("❌ Ошибка при работе ИИ", "red");
+      }
+    };
+    reader.readAsDataURL(file);
+    event.target.value = ""; 
+  }
 
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
