@@ -336,12 +336,12 @@
     } catch(e) { showToast("Ошибка сети", "red"); }
   };
 
-  // Обработка фото для ИИ
+    // Обработка фото для ИИ
   async function handleAIImage(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    showToast("🤖 ИИ анализирует фото... Подождите", "blue");
+    showToast("🤖 ИИ смотрит на картинку... Подождите", "blue");
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -358,16 +358,21 @@
         if (data.success && data.staff && data.staff.length > 0) {
           let addedCount = 0;
           for (const person of data.staff) {
+            // Если ИИ не нашел ранг, ставим 1
+            let finalRank = person.rank ? String(person.rank).replace(/\D/g, '') : "1";
+            if (finalRank === "Leader") finalRank = "28";
+            if (!finalRank) finalRank = "1";
+
             await fetch(WORKER_URL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ 
                 action: "addStaff", 
-                name: person.name, 
-                passport: person.passport, 
-                position: person.position || "Не указано", 
-                rank: person.rank || "1", 
-                department: "МинЗдрав" 
+                name: person.name || "Неизвестный", 
+                passport: person.passport || "00000", 
+                position: person.position || "Сотрудник", 
+                rank: finalRank, 
+                department: "МинЗдрав" // Отдел жестко МинЗдрав
               })
             });
             addedCount++;
@@ -378,6 +383,7 @@
           showToast("❌ ИИ не смог найти сотрудников на фото", "red");
         }
       } catch (err) {
+        console.error(err);
         showToast("❌ Ошибка при работе ИИ", "red");
       }
     };
