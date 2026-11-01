@@ -343,7 +343,7 @@
         const data = await res.json();
         
         // ВЫВОДИМ ТЕКСТ В КОНСОЛЬ (Нажми F12, чтобы увидеть)
-        console.log("🤖 ОТВЕТ ОТ ИИ:", data.rawText);
+        console.log("🤖 ПОЛНЫЙ ОТВЕТ ОТ CLOUDFLARE:", JSON.stringify(data, null, 2));
 
         if (!data.success) {
           return showToast(`❌ ${data.message}`, "red");
