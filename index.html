@@ -248,7 +248,7 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          $("appIframe").src = "apps/users.html"; 
+          $("appIframe").src = "apps/users.html?v=" + Date.now(); 
         } 
         else if (a.id === 'weekly') {
           $("authScreen").classList.add("hidden"); 
@@ -256,7 +256,7 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          $("appIframe").src = "apps/weekly.html"; 
+          $("appIframe").src = "apps/weekly.html?v=" + Date.now();
         }
         else if (a.id === 'about') {
           $("authScreen").classList.add("hidden"); 
@@ -273,7 +273,7 @@
           $("appFrame").classList.remove("hidden");
           $("appHeader").classList.remove("hidden"); 
           $("currentAppTitle").textContent = a.label; 
-          $("appIframe").src = "apps/calculator.html"; 
+          $("appIframe").src = "apps/calculator.html?v=" + Date.now(); 
         }
         else {
           showToast("Раздел в разработке");
